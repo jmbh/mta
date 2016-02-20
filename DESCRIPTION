@@ -1,0 +1,11 @@
+Package: mta
+Type: Package
+Title: Processing of 2d movement data from 2-choice mousetracking experiments
+Version: 0.01
+Date: 2016-02-20
+Author: Jonas Haslbeck
+Maintainer: Jonas Haslbeck  <jonashaslbeck@gmail.com>
+Description: Processing of 2d movement data from 2-choice mousetracking experiments
+License: ?
+Imports: plyr
+LazyData: true
