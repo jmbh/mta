@@ -52,7 +52,7 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
   
   # +++ stretch +++
   
-  if(is.na(stretch)==FALSE) {
+  if(is.na(stretch)[1]==FALSE) {
     
     dat_str <- ddply(dat, i.id, function(traj) {
       # starting point
@@ -73,7 +73,10 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
   call <- list('i.xyt'=i.xyt, 'i.id'=i.id, 'layout'=layout, 'type'=type, 
                'steps'=steps, 'start2zero'=start2zero, 'stretch'=stretch)
   outlist <- list('call'=call, 'data'=dat)
-   
+  
+  class(outlist) <- 'mta'
+  
+  return(outlist) 
 }
 
 
