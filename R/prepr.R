@@ -81,9 +81,9 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
       } else {
         dat_aux_1r <- unlist(dat_aux[1,])
       }
-      m <- matrix(rep(dat_aux_1r, times=steps), steps, nv, byrow = TRUE)
+      m <- as.data.frame(matrix(rep(dat_aux_1r, times=steps), steps, nv, byrow = TRUE))
       colnames(m) <- namesv
-      return(as.data.frame(m))
+      return(m)
       })
   
     dat <- data.frame(dat, aux_vars[, ! names(aux_vars) %in% i.id])
