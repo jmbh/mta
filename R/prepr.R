@@ -87,7 +87,7 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
   
   
   # output
-  call <- list('i.xyt'=i.xyt, 'i.id'=i.id, 'layout'=layout, 'type'=type, 
+  call <- list('i.xyt'=i.xyt, 'i.id'=i.id,  'type'=type, 
                'steps'=steps, 'start2zero'=start2zero, 'stretch'=stretch)
   outlist <- list('call'=call, 'data'=dat)
   
