@@ -9,7 +9,7 @@ Preprocessing computer mouse trajectories
 \description{
 Function to normalize trajectories across time or space and to strech trajectory to a norm display.}
 \usage{
-prepr(data, i.xyt, i.id, layout, type, steps = 101, start2zero = TRUE, stretch = NA)
+prepr(data, i.xyt, i.id, type, steps = 101, start2zero = TRUE, stretch = NA)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -20,9 +20,6 @@ Vector with the column names of the x, y, t variables in that order.
 }
   \item{i.id}{
 Vector with the column names of the indicator variables that uniquely identify single trajectories (e.g. c('experiment1', 'trial')).
-}
-  \item{layout}{
-A list that specifyies the start- and end points in the experimental setup. See examples for the exact specification.
 }
   \item{type}{\code{type='time'} normalizes trajectory with respect to time (all trajectories have the same amount of time steps), \code{type='spatial'} normalizes trajectories with respect to space, i.e. we equally distribute \code{steps} points along the trajectory.}
   \item{steps}{The number of steps that should intrapolated}
@@ -62,13 +59,11 @@ head(dataraw)
 
 # we use prepr() to time normalize all trajectories to 101 time-steps and strech them to a norm display
 
-layout <- list("start"=c(960,230), "left"=c(130,905), "right"=c(1830,905)) 
 layout_stretch <- list("start"=c(0,0), "left"=c(-1,1.5), "right"=c(1,1.5))
 
 output <- prepr(data = dataraw, 
                 i.xyt = c('x', 'y', 't'), 
                 i.id = 'trial', 
-                layout, 
                 type = "time", 
                 steps = 101, 
                 start2zero = TRUE, 

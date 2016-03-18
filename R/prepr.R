@@ -2,7 +2,6 @@
 prepr <- function(data, # data frame with x,y,t and flagging variables
                   i.xyt, # names of columns for x,y,t in this order
                   i.id, # names of variables if id variables
-                  layout, # list with box coordinates
                   type = "time", # also: spatial 
                   steps = 101, 
                   start2zero = TRUE, #
@@ -23,7 +22,7 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
   
   # +++ set starting point of each trajectory to (0,0) +++
   if(start2zero==TRUE) {
-    newdat <- ddply(dat, colnames(dat)[-(1:3)], function(x) {
+    dat <- ddply(dat, colnames(dat)[-(1:3)], function(x) {
       x[,1] <- x[1,1] - x[,1] # set x-start to zero
       x[,2] <- x[1,2] - x[,2] # set y-start to zero
       x
