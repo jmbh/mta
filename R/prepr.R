@@ -70,8 +70,10 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
   }
   
   # +++ add aux variables if specified +++
-  if(takeAllvar==TRUE) {
-     
+  namesv <- names(data)[!names(data) %in% c(i.id, i.xyt)]
+  
+    if(takeAllvar==TRUE & !is.null(namesv)) {
+
     aux_vars <- ddply(data, i.id, function(x) {
       namesv <- names(x)[!names(x) %in% c(i.id, i.xyt)]
       nv <- length(namesv)
@@ -82,16 +84,16 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
         dat_aux_1r <- unlist(dat_aux[1,])
       }
       m <- as.data.frame(matrix(rep(dat_aux_1r, times=steps), steps, nv, byrow = TRUE))
-      colnames(m) <- namesv
+      names(m) <- namesv
       return(m)
       })
   
-    dat <- data.frame(dat, aux_vars[, ! names(aux_vars) %in% i.id])
+    dat[,namesv] <- aux_vars[, ! names(aux_vars) %in% i.id]
     
   }
   
   # reorder columns
-  dat <- dat[,c(i.id, i.xyt, names(dat)[! names(dat) %in% c(i.id, i.xyt)] )]
+  dat <- dat[,c(i.id, i.xyt, namesv)]
   
   # output
   call <- list('i.xyt'=i.xyt, 'i.id'=i.id,  'type'=type, 
