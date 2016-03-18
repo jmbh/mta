@@ -85,6 +85,8 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
     
   }
   
+  # reorder columns
+  dat <- dat[,c(i.id, i.xyt, names(dat)[! names(dat) %in% c(i.id, i.xyt)] )]
   
   # output
   call <- list('i.xyt'=i.xyt, 'i.id'=i.id,  'type'=type, 
