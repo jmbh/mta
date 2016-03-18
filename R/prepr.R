@@ -76,7 +76,12 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
       namesv <- names(x)[!names(x) %in% c(i.id, i.xyt)]
       nv <- length(namesv)
       dat_aux <- x[,!names(x) %in% c(i.id, i.xyt)]
-      m <- matrix(rep(unlist(dat_aux[1,]), times=steps), steps, nv, byrow=TRUE)
+      if(nv==1) {
+        dat_aux_1r <- dat_aux[1]  
+      } else {
+        dat_aux_1r <- unlist(dat_aux[1,])
+      }
+      m <- matrix(rep(dat_aux_1r, times=steps), steps, nv, byrow = TRUE)
       colnames(m) <- namesv
       return(as.data.frame(m))
       })
