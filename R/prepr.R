@@ -6,7 +6,8 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
                   type = "time", # also: spatial 
                   steps = 101, 
                   start2zero = TRUE, #
-                  stretch = NA) # same form as layout
+                  stretch = NA,
+                  takeAllvar = FALSE) # same form as layout
   
 {
   
@@ -68,6 +69,23 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
     dat <- dat_str[,c(cn, i.id)]
     
   }
+  
+  # +++ add aux variables if specified +++
+  if(takeAllvar==TRUE) {
+     
+    aux_vars <- ddply(data, i.id, function(x) {
+      namesv <- names(x)[!names(x) %in% c(i.id, i.xyt)]
+      nv <- length(namesv)
+      dat_aux <- x[,!names(x) %in% c(i.id, i.xyt)]
+      m <- matrix(rep(unlist(dat_aux[1,]), times=steps), steps, nv, byrow=TRUE)
+      colnames(m) <- namesv
+      return(as.data.frame(m))
+      })
+  
+    dat <- data.frame(dat, aux_vars[, ! names(aux_vars) %in% i.id])
+    
+  }
+  
   
   # output
   call <- list('i.xyt'=i.xyt, 'i.id'=i.id, 'layout'=layout, 'type'=type, 
