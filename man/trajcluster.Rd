@@ -3,7 +3,7 @@
 \alias{trajcluster}
 
 \title{
-Preprocessing computer mouse trajectories
+Clustering mouse tracking trajectories
 }
 \description{
 Function to cluster mouse trajectory using hierarchical cluster analysis or distance to given prototypical trajectories}
