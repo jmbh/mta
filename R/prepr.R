@@ -1,4 +1,5 @@
 
+
 prepr <- function(data, # data frame with x,y,t and flagging variables
                   i.xyt, # names of columns for x,y,t in this order
                   i.id, # names of variables if id variables
@@ -6,7 +7,8 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
                   steps = 101, 
                   start2zero = TRUE, #
                   stretch = NA,
-                  takeAllvar = FALSE) # same form as layout
+                  takeAllvar = FALSE, 
+                  nResc = NA) # data points on line in spatial rescale
   
 {
   
@@ -22,9 +24,9 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
   
   # +++ set starting point of each trajectory to (0,0) +++
   if(start2zero==TRUE) {
-    dat <- ddply(dat, colnames(dat)[-(1:3)], function(x) {
-      x[,1] <- x[1,1] - x[,1] # set x-start to zero
-      x[,2] <- x[1,2] - x[,2] # set y-start to zero
+    dat <- ddply(dat, i.id, function(x) {
+      x[,1] <- x[,1] - x[1,1] # set x-start to zero
+      x[,2] <- x[,2] - x[1,2] # set y-start to zero
       x
     })
   }
@@ -45,14 +47,12 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
   
   # +++ normalize wrt space +++
   if(type=='spatial') {
-    
-    stop("not impemented yet ...")
-    
+    if(is.na(nResc)) {stop("Please specify the number of points to be interpolated on each trajectory (nResc)")}
+    dat <- spatialRescale(data, i.id, i.xyt, nResc)
   }
   
   # +++ stretch +++
-  
-  if(is.na(stretch)[1]==FALSE) {
+    if(is.na(stretch)[1]==FALSE) {
     
     dat_str <- ddply(dat, i.id, function(traj) {
       # starting point
@@ -68,6 +68,10 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
     dat <- dat_str[,c(cn, i.id)]
     
   }
+  
+  # +++ calculate side of chosen box +++
+  dat$chosen.box <- getside(dat, i.id)
+  other <- 'chosen.box'
   
   # +++ add aux variables if specified +++
   namesv <- names(data)[!names(data) %in% c(i.id, i.xyt)]
@@ -89,11 +93,13 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
       })
   
     dat[,namesv] <- aux_vars[, ! names(aux_vars) %in% i.id]
+    dat <- dat[,c(i.id, i.xyt, other, namesv)]
     
   }
   
   # reorder columns
-  dat <- dat[,c(i.id, i.xyt, namesv)]
+  dat <- dat[,c(i.id, i.xyt, other)]
+  
   
   # output
   call <- list('i.xyt'=i.xyt, 'i.id'=i.id,  'type'=type, 
@@ -104,9 +110,6 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
   
   return(outlist) 
 }
-
-
-
 
 
 

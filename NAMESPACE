@@ -1,2 +1,9 @@
+useDynLib(mta)
+importFrom(Rcpp, evalCpp)
 importFrom(plyr, ddply)
-export(prepr)
+importFrom(fastcluster, as.dist, hclust)
+importFrom(spdep, Rotation)
+export(prepr, trajcluster)
+
+
+# S3method(print, mta)

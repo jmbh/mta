@@ -6,6 +6,7 @@ Date: 2016-02-20
 Author: Jonas Haslbeck
 Maintainer: Jonas Haslbeck  <jonashaslbeck@gmail.com>
 Description: Processing of 2d movement data from 2-choice mousetracking experiments
-License: ?
-Imports: plyr
+License: GPL (>= 2)
+Imports: Rcpp (>= 0.11.4), plyr, fastcluster, spdep
+LinkingTo: Rcpp
 LazyData: true
