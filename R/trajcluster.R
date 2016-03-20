@@ -1,31 +1,34 @@
 
-library(plyr)
-library(Rcpp)
-library(fastcluster)
+
+## TESTING 
+
+#library(plyr)
+#library(Rcpp)
+#library(fastcluster)
 
 # get functions
-setwd("G:\\_projects_ongoing\\MPI\\mta\\R")
-source("getside.R")
-source("spatialRescale.R")
-source("prepr.R")
-setwd("G:\\_projects_ongoing\\MPI\\mta\\src")
-sourceCpp("distmat.cpp")
+#setwd("G:\\_projects_ongoing\\MPI\\mta\\R")
+#source("getside.R")
+#source("spatialRescale.R")
+#source("prepr.R")
+#setwd("G:\\_projects_ongoing\\MPI\\mta\\src")
+#sourceCpp("distmat.cpp")
 
 # data
-setwd("G:\\_projects_ongoing\\MPI\\mta\\data")
-load("prototypes.RData")
-load("data_sp2015.RData")
-
-layout <- list("start"=c)
-
+#setwd("G:\\_projects_ongoing\\MPI\\mta\\data")
+#load("prototypes.RData")
+#load("data_sp2015.RData")
 
 # function input for testing
-i.xyt <- c('x', 'y', 't')
-i.id <- c('id.ptp', 'id.trial')
-stretch <- list("start"=c(0,0), "left"=c(-1,1.5), "right"=c(1,1.5))
+#i.xyt <- c('x', 'y', 't')
+#i.id <- c('id.ptp', 'id.trial')
+#stretch <- list("start"=c(0,0), "left"=c(-1,1.5), "right"=c(1,1.5))
 
-dat_norm <- prepr(data_sp2015, i.xyt, i.id, stretch = stretch)
-data <- dat_norm$data
+#dat_norm <- prepr(data_sp2015, i.xyt, i.id, stretch = stretch)
+#data <- dat_norm$data
+
+#clus_obj <- trajcluster(data, i.xyt, i.id, type=c("hierarchical", "prototypes"),
+#                        nclust=4, nResc = 10, prototypes = prototypes) 
 
 
 
@@ -36,9 +39,7 @@ trajcluster <- function(data,
                         nclust = 4, # numer of desired clusters if no prototypes
                         nResc = 10, # number of data points for spatial rescaling
                         prototypes = NA, # list of prototypical trajectories
-                        subsampN = NA, # maximal N number of trajectories; to render analysis possible in the case of huge number of trajectories
-                        side = NA, # vector specifying the chosen box (0=left, 1=right) in each traj; default: calculated from data
-                        ... # some other things that we pass to the cluster function
+                        subsampN = NA # maximal N number of trajectories; to render analysis possible in the case of huge number of trajectories
 )
   
 {
@@ -51,7 +52,7 @@ trajcluster <- function(data,
   
   # +++ compute some derivatives form data +++
   n_trial <- nrow(rowcheck)
-  if(is.na(side[1])==TRUE) { side <- getside(data, i.id)}
+  side <- getside(data, i.id)
   step <- steps[1]
   data$x[side==1] <- data$x[side==1]*-1 #flip all trjectories to the left
   
@@ -137,6 +138,4 @@ trajcluster <- function(data,
   return(outlist)
   
 }
-
-
 

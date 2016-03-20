@@ -1,6 +1,6 @@
 \name{mta-internal}
 \title{Internal mta functions or data}
-\alias{dataraw, simTraj, getside, spatialRescale, spatialRescale1Traj}
+\alias{dataraw, simTraj, getside, spatialRescale, spatialRescale1Traj, data_sp2015, prototypes}
 
 \description{Internal mta functions}
 

@@ -7,8 +7,7 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
                   steps = 101, 
                   start2zero = TRUE, #
                   stretch = NA,
-                  takeAllvar = FALSE, 
-                  nResc = NA) # data points on line in spatial rescale
+                  takeAllvar = FALSE) 
   
 {
   
@@ -47,8 +46,8 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
   
   # +++ normalize wrt space +++
   if(type=='spatial') {
-    if(is.na(nResc)) {stop("Please specify the number of points to be interpolated on each trajectory (nResc)")}
-    dat <- spatialRescale(data, i.id, i.xyt, nResc)
+    if(is.na(steps)) {stop("Please specify the number of points to be interpolated on each trajectory (steps)")}
+    dat <- spatialRescale(data, i.id, i.xyt, steps)
   }
   
   # +++ stretch +++
