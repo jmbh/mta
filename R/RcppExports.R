@@ -5,3 +5,11 @@ distmat <- function(id, x, y, n) {
     .Call('mta_distmat', PACKAGE = 'mta', id, x, y, n)
 }
 
+f_rescale_c <- function(x, y, npts) {
+    .Call('mta_f_rescale_c', PACKAGE = 'mta', x, y, npts)
+}
+
+spatialRescale_c <- function(trs, npts) {
+    .Call('mta_spatialRescale_c', PACKAGE = 'mta', trs, npts)
+}
+

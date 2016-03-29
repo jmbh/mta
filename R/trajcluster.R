@@ -39,46 +39,59 @@ trajcluster <- function(data,
                         nclust = 4, # numer of desired clusters if no prototypes
                         nResc = 10, # number of data points for spatial rescaling
                         prototypes = NA, # list of prototypical trajectories
-                        subsampN = NA # maximal N number of trajectories; to render analysis possible in the case of huge number of trajectories
-)
+                        subsampN = NA, # maximal N number of trajectories; to render analysis possible in the case of huge number of trajectories
+                        stretch = list('start' = c(0,0),'left' = c(-1,1.5)) #
+                        )
   
 {
   
-  # +++ check input +++
-  if(sum(is.na(data))>0) {stop('No missing values permitted.')}
-  rowcheck <- ddply(data, i.id, nrow)
-  steps <- rowcheck[,ncol(rowcheck)]
-  if(var(steps)>0) {stop('All trajectories must have the same length!')}
-  
-  # +++ compute some derivatives form data +++
-  n_trial <- nrow(rowcheck)
-  side <- getside(data, i.id)
-  step <- steps[1]
-  data$x[side==1] <- data$x[side==1]*-1 #flip all trjectories to the left
   
   # +++ subsampling +++
+  n_trials = nrow(unique(data[,i.id]))
   if(is.na(subsampN)==FALSE) {
     if(n_trials>subsampN) {
-      id <- rep(1:n_trials, each=step)
-      s_id <- sample(1:n_trials, subsampN, replace = FALSE)
-      data <- dat[id %in% s_id,]  
+      ids = apply(data[,i.id],1,paste0,collapse='-')
+      sel = sample(unique(ids),subsampN)
+      data <- data[ids %in% sel,]  
     }
   }
+
+  # +++ stretch +++
+  dat_str <- ddply(data, i.id, function(traj) {
+      # starting point
+      X <- traj$x - traj$x[1]; X <- X + stretch$start[1]
+      Y <- traj$y - traj$y[1]; Y <- Y + stretch$start[2]
+      # end point
+      X <- (X / abs(X[length(X)])) * abs(stretch$left[1])     
+      Y <- (Y / abs(Y[length(Y)])) * abs(stretch$left[2])     
+      t <- traj$t
+      res = data.frame(cbind(X,Y,t))
+      names(res) = i.xyt
+      return(res)
+      })
+
+  # +++ compute some derivatives form data +++
+  side <- getside(dat_str, i.id)
+  dat_str[,i.xyt[1]][side==1] <- dat_str[,i.xyt[1]][side==1]*-1 #flip all trjectories to the left
+    
+  # +++ check input +++
+  if(sum(is.na(dat_str))>0) {stop('No missing values permitted.')}
   
   # +++ rescale trajectories +++
-  dat_resc <- spatialRescale(data, i.id, i.xyt, nResc)
+  dat_resc <- spatialRescale(dat_str, i.id, i.xyt, nResc)
+  
   
   # ++++++++++++++++++ hierarchical clustering ++++++++++++++++++
   
   if('hierarchical' %in% type) {
   
   # +++ calculate distance matrix +++
-  id <- 1:n_trial
+  id <- 1:nrow(unique(dat_resc[,i.id]))
   distm <- distmat(id, dat_resc$x , dat_resc$y, nResc)
 
   # +++ clustering +++
   md <- as.dist(distm)
-  clust_obj <- fastcluster::hclust(md, method = "ward.D")
+  clust_obj <- fastcluster::hclust(md, method = "ward.D", )
   cl <- rep(cutree(clust_obj, nclust), each=nResc)
   dat_resc$cl <- cl
   
@@ -103,7 +116,7 @@ trajcluster <- function(data,
       pr_df <- as.data.frame(prototypes[[i]])
       colnames(pr_df) <- c("x", "y")
       pr_df$id <- i
-      l_proto_sc[[i]] <- spatialRescale(pr_df, "id", i.xyt, nResc)   
+      l_proto_sc[[i]] <- f_rescale_c(pr_df[,1], pr_df[,2], nResc)   
     }
     
     # +++ calculate distances & assign lable +++
@@ -111,8 +124,8 @@ trajcluster <- function(data,
       dists <- rep(NA,n_proto)
       for(i in 1:n_proto) {
         dat_pr_i <- l_proto_sc[[i]]
-        dists[i] <- sqrt(sum(c((x[,i.xyt[1]] - dat_pr_i[,2])^2,
-                               (x[,i.xyt[2]] - dat_pr_i[,3])^2))) 
+        dists[i] <- sqrt(sum(c((x[,i.xyt[1]] - dat_pr_i[,1])^2,
+                               (x[,i.xyt[2]] - dat_pr_i[,2])^2))) 
       }
       return(dists)
     })
