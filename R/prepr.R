@@ -6,7 +6,7 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
                   type = "time", # also: spatial 
                   steps = 101, 
                   start2zero = TRUE, #
-                  stretch = NA,
+                  stretch = list('start' = c(0,0),'left' = c(-1,1.5)),
                   takeAllvar = FALSE) 
   
 {
@@ -83,9 +83,9 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
       dat_aux <- x[,!names(x) %in% c(i.id, i.xyt)]
       if(nv==1) {
         dat_aux_1r <- dat_aux[1]  
-      } else {
+        } else {
         dat_aux_1r <- unlist(dat_aux[1,])
-      }
+        }
       m <- as.data.frame(matrix(rep(dat_aux_1r, times=steps), steps, nv, byrow = TRUE))
       names(m) <- namesv
       return(m)
