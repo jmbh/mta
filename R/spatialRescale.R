@@ -14,7 +14,7 @@ spatialRescale <- function(data, i.id, i.xyt, nResc) {
     }
   
   dat   = dlply(data,i.id,function(x) as.matrix(x[,i.xyt]))
-  dat_r = spatialRescale_c(dat, 10)
+  dat_r = spatialRescale_c(dat, nResc)
   front = ddply(data[,i.id],i.id,function(x) matrix(1:nResc,ncol=1))
   data_resc = data.frame(front, dat_r[,1], dat_r[,2])
   data_resc = data_resc[,c(1,2,4,5,3)]
