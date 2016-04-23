@@ -19,3 +19,28 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// f_rescale_c
+NumericMatrix f_rescale_c(NumericVector x, NumericVector y, int npts);
+RcppExport SEXP mta_f_rescale_c(SEXP xSEXP, SEXP ySEXP, SEXP nptsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type y(ySEXP);
+    Rcpp::traits::input_parameter< int >::type npts(nptsSEXP);
+    __result = Rcpp::wrap(f_rescale_c(x, y, npts));
+    return __result;
+END_RCPP
+}
+// spatialRescale_c
+NumericMatrix spatialRescale_c(GenericVector trs, int npts);
+RcppExport SEXP mta_spatialRescale_c(SEXP trsSEXP, SEXP nptsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< GenericVector >::type trs(trsSEXP);
+    Rcpp::traits::input_parameter< int >::type npts(nptsSEXP);
+    __result = Rcpp::wrap(spatialRescale_c(trs, npts));
+    return __result;
+END_RCPP
+}

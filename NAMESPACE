@@ -1,6 +1,7 @@
 useDynLib(mta)
 importFrom(Rcpp, evalCpp)
 importFrom(plyr, ddply)
+importFrom(plyr, dlply)
 importFrom(stats,as.dist)
 importFrom(fastcluster, hclust)
 export(prepr, trajcluster)
