@@ -25,9 +25,6 @@ NumericMatrix f_rescale_c(NumericVector x, NumericVector y, int npts) {
     steps[i] = step * i;
     }
   
-  std::cout << steps << '\n';
-  std::cout << cumdiffs << '\n';
-  
   // Loop over number of points for final 
   for(int i = 0; i < npts; i++){
     ind = 0;
