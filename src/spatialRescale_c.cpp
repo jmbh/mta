@@ -8,22 +8,31 @@ NumericMatrix f_rescale_c(NumericVector x, NumericVector y, int npts) {
   NumericVector cumdiffs(n), steps(npts);
   NumericMatrix xyn(npts,2);
   double step, w1, w2, stepi, cumdiffi;
+  
+  
+  // Calculate cumulative distances between points
   for(int i = 0; i < n; i++){
     if(i < 1){
-      cumdiffs[i] = sqrt(pow(x[i],2) + pow(y[i],2));
+      cumdiffs[i] = 0.0;
       } else {
       cumdiffs[i] = cumdiffs[i-1] + sqrt(pow(x[i] - x[i-1],2) + pow(y[i] - y[i-1],2));
       }
     }
+  
+  // Calculate vector with equidistant steps
   step = double(cumdiffs[n-1]) / double(npts-1);
   for(double i = 0; i < npts; i++){
     steps[i] = step * i;
-    
     }
+  
+  std::cout << steps << '\n';
+  std::cout << cumdiffs << '\n';
+  
+  // Loop over number of points for final 
   for(int i = 0; i < npts; i++){
     ind = 0;
     for(int j = 0; j < n; j++){
-      stepi = steps[i];
+      stepi    = steps[i];
       cumdiffi = cumdiffs[j];
       if(stepi > cumdiffi) ind++;
       }
@@ -34,8 +43,8 @@ NumericMatrix f_rescale_c(NumericVector x, NumericVector y, int npts) {
       xyn(i,1) = double(y[ind-1]) * w2/(w1+w2) + double(y[ind]) * w1/(w1+w2);        
       }      
     else if(i == 0){
-      xyn(i,0) = 0.0;
-      xyn(i,1) = 0.0;        
+      xyn(i,0) = double(x[0]);
+      xyn(i,1) = double(y[0]);        
       }
     else {
       xyn(i,0) = double(x[n-1]);
