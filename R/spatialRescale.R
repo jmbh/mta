@@ -22,6 +22,3 @@ spatialRescale <- function(data, i.id, i.xyt, nResc) {
   return(data_resc)
   }
 
-
-
-

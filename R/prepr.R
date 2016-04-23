@@ -48,7 +48,7 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
   if(type=='spatial') {
     if(is.na(steps)) {stop("Please specify the number of points to be interpolated on each trajectory (steps)")}
     dat <- spatialRescale(data, i.id, i.xyt, steps)
-  }
+    }
   
   # +++ stretch +++
     if(is.na(stretch)[1]==FALSE) {
