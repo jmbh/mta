@@ -1,6 +1,6 @@
 
 
-derivatives <- function(data,
+trajstats <- function(data,
                         i.xyt = c('x','y','t'), 
                         i.id  = c('ptp','trial'))
   
