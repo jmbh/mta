@@ -36,8 +36,9 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
   dat$choice <- getside(dat, i.id)
   
   # +++ flip trajectories to left side ++++
-  if(fliponeside & start2zero) dat$x = ifelse(dat$choice == 1, dat$x = dat$x*-1, dat$x)
-  
+  if(fliponeside & start2zero) dat$x = ifelse(dat$choice == 1, dat$x*-1, dat$x)
+  if(fliponeside & !start2zero) stop('Flipping should only be done for start2zero == T')
+    
   # +++ normalize wrt time +++
   if(type=='time') {
     n_dat <- ddply(dat, i.id, function(traj) {
