@@ -5,7 +5,8 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
                   i.id  = c('ptp','trial'), # names of variables if id variables
                   type = "time", # also: spatial 
                   steps = 101, 
-                  start2zero = TRUE, #
+                  start2zero = TRUE, 
+                  fliponeside = TRUE, 
                   stretch = list('start' = c(0,0),'left' = c(-1,1.5)),
                   takeAllvar = FALSE) 
   
@@ -21,6 +22,7 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
   dat <- data.frame(data[,c(i.xyt, i.id)])
   colnames(dat)[1:3] <- cn <-c('x', 'y', 't')
   
+  
   # +++ set starting point of each trajectory to (0,0) +++
   if(start2zero==TRUE) {
     dat <- ddply(dat, i.id, function(x) {
@@ -30,9 +32,14 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
     })
   }
   
+  # +++ calculate side of chosen box+++
+  dat$choice <- getside(dat, i.id)
+  
+  # +++ flip trajectories to left side ++++
+  if(fliponeside & start2zero) dat$x = ifelse(dat$choice == 1, dat$x = dat$x*-1, dat$x)
+  
   # +++ normalize wrt time +++
   if(type=='time') {
-    
     n_dat <- ddply(dat, i.id, function(traj) {
       rnorm <- (traj$t-traj$t[1]) / max((traj$t-traj$t[1])) * steps
       a.x <- approx(rnorm, traj$x,  xout = 0:(steps-1), method = "linear") 
@@ -41,7 +48,6 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
     })
     colnames(n_dat) <- c(i.id, cn)
     dat <- n_dat[,c(cn, i.id)]
-    
   }
   
   # +++ normalize wrt space +++
@@ -68,15 +74,9 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
     
   }
   
-  # +++ calculate side of chosen box +++
-  dat$choice <- getside(dat, i.id)
-  other <- 'choice'
-  
   # +++ add aux variables if specified +++
   namesv <- names(data)[!names(data) %in% c(i.id, i.xyt)]
-  
     if(takeAllvar==TRUE & !is.null(namesv)) {
-
     aux_vars <- ddply(data, i.id, function(x) {
       namesv <- names(x)[!names(x) %in% c(i.id, i.xyt)]
       nv <- length(namesv)
@@ -90,14 +90,12 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
       names(m) <- namesv
       return(m)
       })
-  
     dat[,namesv] <- aux_vars[, ! names(aux_vars) %in% i.id]
     dat <- dat[,c(i.id, i.xyt, other, namesv)]
-    
-  }
+    }
   
   # reorder columns
-  dat <- dat[,c(i.id, i.xyt, other)]
+  dat <- dat[,c(i.id, i.xyt)]
   
   
   # output
