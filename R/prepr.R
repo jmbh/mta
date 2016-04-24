@@ -1,8 +1,8 @@
 
 
 prepr <- function(data, # data frame with x,y,t and flagging variables
-                  i.xyt, # names of columns for x,y,t in this order
-                  i.id, # names of variables if id variables
+                  i.xyt = c('x','y','t'), # names of columns for x,y,t in this order
+                  i.id  = c('ptp','trial'), # names of variables if id variables
                   type = "time", # also: spatial 
                   steps = 101, 
                   start2zero = TRUE, #
