@@ -69,8 +69,8 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
   }
   
   # +++ calculate side of chosen box +++
-  dat$chosen.box <- getside(dat, i.id)
-  other <- 'chosen.box'
+  dat$choice <- getside(dat, i.id)
+  other <- 'choice'
   
   # +++ add aux variables if specified +++
   namesv <- names(data)[!names(data) %in% c(i.id, i.xyt)]
