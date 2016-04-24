@@ -9,6 +9,5 @@ derivatives <- function(data,
  dists = dlply(data,c(i.id),function(x) dist(x$x,x$y))
  MAD = sapply(dists,max)
  AAD = sapply(dists,mean)
-  
-  
+ return(list('MAD'=MAD,'AAD'=AAD,'dists'=dists))  
 }
