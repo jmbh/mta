@@ -4,7 +4,7 @@ importFrom(plyr, ddply)
 importFrom(plyr, dlply)
 importFrom(stats,as.dist)
 importFrom(fastcluster, hclust)
-export(prepr, trajcluster)
+export(prepr, trajcluster, derivatives)
 
 
 # S3method(print, mta)
