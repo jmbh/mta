@@ -58,8 +58,8 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
       X <- traj$x - traj$x[1]; X <- X + stretch$start[1]
       Y <- traj$y - traj$y[1]; Y <- Y + stretch$start[2]
       # end point
-      X <- (X / abs(X[length(X)])) * abs(stretch$left[1])     
-      Y <- (Y / abs(Y[length(Y)])) * abs(stretch$left[2])     
+      X <- (X / abs(X[length(X)])) * stretch$left[1]     
+      Y <- (Y / abs(Y[length(Y)])) * stretch$left[2]     
       t <- traj$t
       cbind(X,Y,t)
     })
