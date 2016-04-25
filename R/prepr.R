@@ -38,7 +38,9 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
   # +++ flip trajectories to left side ++++
   if(fliponeside & start2zero) dat$x = ifelse(dat$choice == 1, dat$x*-1, dat$x)
   if(fliponeside & !start2zero) stop('Flipping should only be done for start2zero == T')
-    
+  
+  
+  
   # +++ normalize wrt time +++
   if(type=='time') {
     n_dat <- ddply(dat, i.id, function(traj) {
@@ -57,23 +59,25 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
     dat <- spatialRescale(data, i.id, i.xyt, steps)
     }
   
+  
+  
   # +++ stretch +++
     if(is.na(stretch)[1]==FALSE) {
-    
     dat_str <- ddply(dat, i.id, function(traj) {
       # starting point
       X <- traj$x - traj$x[1]; X <- X + stretch$start[1]
       Y <- traj$y - traj$y[1]; Y <- Y + stretch$start[2]
       # end point
-      X <- (X / abs(X[length(X)])) * stretch$left[1]     
-      Y <- (Y / abs(Y[length(Y)])) * stretch$left[2]     
+      X <- (X / X[length(X)]) * stretch$left[1]     
+      Y <- (Y / Y[length(Y)]) * stretch$left[2]     
       t <- traj$t
       cbind(X,Y,t)
-    })
+      })
     colnames(dat_str) <- c(i.id, cn)
     dat <- dat_str[,c(cn, i.id)]
-    
-  }
+    }
+  
+  
   
   # +++ add aux variables if specified +++
   namesv <- names(data)[!names(data) %in% c(i.id, i.xyt)]
