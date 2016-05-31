@@ -19,15 +19,13 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
   if(sum(is.na(data)>0)) {  stop("No missing values permitted.")  }
   
   # +++ prepare data +++
-  dat <- data.frame(data[,c(i.xyt, i.id)])
-  colnames(dat)[1:3] <- cn <-c('x', 'y', 't')
-  
+  dat <- data.frame(data[,c(i.id,i.xyt)])
   
   # +++ set starting point of each trajectory to (0,0) +++
   if(start2zero==TRUE) {
     dat <- ddply(dat, i.id, function(x) {
-      x[,1] <- x[,1] - x[1,1] # set x-start to zero
-      x[,2] <- x[,2] - x[1,2] # set y-start to zero
+      x[,i.xyt[1]] <- x[,i.xyt[1]] - x[1,i.xyt[1]] # set x-start to zero
+      x[,i.xyt[2]] <- x[,i.xyt[2]] - x[1,i.xyt[2]] # set y-start to zero
       x
     })
   }
@@ -39,8 +37,6 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
   if(fliponeside & start2zero) dat$x = ifelse(dat$choice == 1, dat$x*-1, dat$x)
   if(fliponeside & !start2zero) stop('Flipping should only be done for start2zero == T')
   
-  
-  
   # +++ normalize wrt time +++
   if(type=='time') {
     n_dat <- ddply(dat, i.id, function(traj) {
@@ -48,18 +44,16 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
       a.x <- approx(rnorm, traj$x,  xout = 0:(steps-1), method = "linear") 
       a.y <- approx(rnorm, traj$y,  xout = 0:(steps-1), method = "linear") 
       cbind(a.x$y, a.y$y, 0:(steps-1))
-    })
-    colnames(n_dat) <- c(i.id, cn)
-    dat <- n_dat[,c(cn, i.id)]
-  }
+      })
+    colnames(n_dat) <- c(i.id, i.xyt)
+    dat <- n_dat[,c( i.id, i.xyt)]
+    }
   
   # +++ normalize wrt space +++
   if(type=='spatial') {
     if(is.na(steps)) {stop("Please specify the number of points to be interpolated on each trajectory (steps)")}
     dat <- spatialRescale(data, i.id, i.xyt, steps)
     }
-  
-  
   
   # +++ stretch +++
     if(is.na(stretch)[1]==FALSE) {
@@ -73,11 +67,9 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
       t <- traj$t
       cbind(X,Y,t)
       })
-    colnames(dat_str) <- c(i.id, cn)
-    dat <- dat_str[,c(cn, i.id)]
+    colnames(dat_str) <- c(i.id, i.xyt)
+    dat <- dat_str[,c(i.id, i.xyt)]
     }
-  
-  
   
   # +++ add aux variables if specified +++
   namesv <- names(data)[!names(data) %in% c(i.id, i.xyt)]
@@ -98,10 +90,6 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
     dat[,namesv] <- aux_vars[, ! names(aux_vars) %in% i.id]
     dat <- dat[,c(i.id, i.xyt, other, namesv)]
     }
-  
-  # reorder columns
-  dat <- dat[,c(i.id, i.xyt)]
-  
   
   # output
   call <- list('i.xyt'=i.xyt, 'i.id'=i.id,  'type'=type, 
