@@ -34,7 +34,7 @@ gap_statistic <- function(dist, # p x p distance matrix of
   l_curves <- vector('list', length=n)
   set.seed(1)
   l_curves <- lapply(l_curves, function(s) {
-    bz <-  rBezier(x,y,w=rexp(1,.7), resol=steps)
+    bz <-  rBezier(xcor,ycor,w=rexp(1,lambda), resol=steps)
     return(bz)
   })
   # restruct data in dataframe
