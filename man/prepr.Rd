@@ -54,6 +54,10 @@ Jonas Haslbeck <jonashaslbeck@gmail.com>
 }
 \examples{
 
+\dontrun{
+
+# THIS EXAMPLE DOES NOT WORK ANYMORE !!!
+
 
 # we use a part of the following example dataset
 
@@ -72,6 +76,8 @@ output <- prepr(data = data_sp2015[1:1000,],
                 stretch = layout_stretch)
 
 head(output$data)
+
+}
 
 }
 

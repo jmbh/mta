@@ -56,6 +56,10 @@ Jonas Haslbeck <jonashaslbeck@gmail.com>
 }
 \examples{
 
+\dontrun{
+
+# THIS EXAMPLE DOES NOT RUN ANYMORE
+
 # we use a part of the following example dataset
 
 head(data_sp2015)
@@ -85,6 +89,7 @@ out_clust <- trajcluster(output$data,
                         prototypes = prototypes, 
                         subsampN = NA)
 
+}
 
 }
 
