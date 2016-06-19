@@ -16,7 +16,7 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
   stopifnot(class(data[,i.xyt[1]])=='numeric' | class(data[,i.xyt[1]])=='integer')
   stopifnot(class(data[,i.xyt[2]])=='numeric' | class(data[,i.xyt[2]])=='integer')
   stopifnot(class(data[,i.xyt[3]])=='numeric' | class(data[,i.xyt[3]])=='integer')
-  if(sum(is.na(data)>0)) {  stop("No missing values permitted.")  }
+  if(sum(is.na(data[,c(i.xyt,i.id)])>0)) {  stop("No missing values permitted.")  }
   
   # +++ prepare data +++
   dat <- data.frame(data[,c(i.id,i.xyt)])
