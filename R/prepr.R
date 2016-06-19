@@ -52,11 +52,11 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
   # +++ normalize wrt space +++
   if(type=='spatial') {
     if(is.na(steps)) {stop("Please specify the number of points to be interpolated on each trajectory (steps)")}
-    dat <- spatialRescale(data, i.id, i.xyt, steps)
+    dat <- spatialRescale(dat, i.id, i.xyt, steps)
     }
   
   # +++ stretch +++
-    if(is.na(stretch)[1]==FALSE) {
+  if(is.na(stretch)[1]==FALSE) {
     dat_str <- ddply(dat, i.id, function(traj) {
       # starting point
       X <- traj$x - traj$x[1]; X <- X + stretch$start[1]
