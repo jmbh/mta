@@ -40,13 +40,20 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
   # +++ normalize wrt time +++
   if(type=='time') {
     n_dat <- ddply(dat, i.id, function(traj) {
-      rnorm <- (traj$t-traj$t[1]) / max((traj$t-traj$t[1])) * steps
-      a.x <- approx(rnorm, traj$x,  xout = 0:(steps-1), method = "linear") 
-      a.y <- approx(rnorm, traj$y,  xout = 0:(steps-1), method = "linear") 
-      cbind(a.x$y, a.y$y, 0:(steps-1))
+      trajnorm <- (traj$t-traj$t[1]) / max((traj$t-traj$t[1])) * steps
+      a.x <- approx(trajnorm, traj$x,  xout = 0:(steps-1), method = "linear") 
+      a.y <- approx(trajnorm, traj$y,  xout = 0:(steps-1), method = "linear")
+      if(sd(a.x) == 0 | sd(a.y) == 0 | a.x[1] == a.x[nrow(x)] | a.y[1] == a.y[nrow(x)]){
+        warning(paste0('Trial',traj[,i.id[2]],'of participant',traj[,i.id[1]],'has been excluded for having 
+                       zero variance or equal start and end points after time normalization.'))
+        NULL
+        } else {
+        return(cbind(a.x$y, a.y$y, 0:(steps-1)))          
+        }
       })
     colnames(n_dat) <- c(i.id, i.xyt)
     dat <- n_dat[,c( i.id, i.xyt)]
+    
     }
   
   # +++ normalize wrt space +++
