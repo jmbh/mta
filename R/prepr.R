@@ -44,16 +44,19 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
       a.x <- approx(trajnorm, traj$x,  xout = 0:(steps-1), method = "linear")$y 
       a.y <- approx(trajnorm, traj$y,  xout = 0:(steps-1), method = "linear")$y
       if(sd(a.x) == 0 | sd(a.y) == 0 | a.x[1] == a.x[length(a.x)] | a.y[1] == a.y[length(a.y)]){
-        warning(paste('Trial',traj[1,i.id[2]],'of participant',traj[1,i.id[1]],'has been excluded for having 
-                       zero variance or equal start and end points after time normalization.'))
+        warning(paste('Trial',traj[1,i.id[2]],'of participant',traj[1,i.id[1]],'has been excluded for having zero variance or equal start and end points after time normalization.'))
         return(NULL)
         } else {
         res = data.frame(cbind(a.x, a.y, 0:(steps-1)))
         return(res)          
         }
       })
-    colnames(n_dat) <- c(i.id, i.xyt)
-    dat <- n_dat[,c( i.id, i.xyt)]
+    if(nrow(n_dat) > 0){
+      colnames(n_dat) <- c(i.id, i.xyt)
+      dat <- n_dat[,c( i.id, i.xyt)]
+      } else {
+      stop('No valid trials after time normalization.')  
+      } 
     }
   
   # +++ normalize wrt space +++
