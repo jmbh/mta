@@ -41,19 +41,19 @@ prepr <- function(data, # data frame with x,y,t and flagging variables
   if(type=='time') {
     n_dat <- ddply(dat, i.id, function(traj) {
       trajnorm <- (traj$t-traj$t[1]) / max((traj$t-traj$t[1])) * steps
-      a.x <- approx(trajnorm, traj$x,  xout = 0:(steps-1), method = "linear") 
-      a.y <- approx(trajnorm, traj$y,  xout = 0:(steps-1), method = "linear")
-      if(sd(a.x) == 0 | sd(a.y) == 0 | a.x[1] == a.x[nrow(x)] | a.y[1] == a.y[nrow(x)]){
-        warning(paste0('Trial',traj[,i.id[2]],'of participant',traj[,i.id[1]],'has been excluded for having 
+      a.x <- approx(trajnorm, traj$x,  xout = 0:(steps-1), method = "linear")$y 
+      a.y <- approx(trajnorm, traj$y,  xout = 0:(steps-1), method = "linear")$y
+      if(sd(a.x) == 0 | sd(a.y) == 0 | a.x[1] == a.x[length(a.x)] | a.y[1] == a.y[length(a.y)]){
+        warning(paste('Trial',traj[1,i.id[2]],'of participant',traj[1,i.id[1]],'has been excluded for having 
                        zero variance or equal start and end points after time normalization.'))
-        NULL
+        return(NULL)
         } else {
-        return(cbind(a.x$y, a.y$y, 0:(steps-1)))          
+        res = data.frame(cbind(a.x, a.y, 0:(steps-1)))
+        return(res)          
         }
       })
     colnames(n_dat) <- c(i.id, i.xyt)
     dat <- n_dat[,c( i.id, i.xyt)]
-    
     }
   
   # +++ normalize wrt space +++
