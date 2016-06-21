@@ -1,99 +1,107 @@
 
 
-cluster_stability <- function(dist, # p x p distance matrix 
+
+cluster_stability2 <- function(dist, # p x p distance matrix 
                               kseq, # sequence of ks tested
                               Bcomp = 10, # number of bootstrap comparisons
                               norm = FALSE, # norm over pw equal assign,FALSE=as in Wang etal
                               pbar = TRUE,
+                              linkage='complete',
                               ...) # other arguments passed to hclust
 {
   
-  # input checks
+  # Input checks
   p <- ncol(dist)
   m_instab <- matrix(NA, Bcomp, length(kseq)) 
   
-  # compute necesarry bootstrap samples to get Bcomp comparisons
+  # Compute necesarry bootstrap samples to get Bcomp comparisons
   Bsamp <- ceiling(.5 * (sqrt(8*Bcomp+1) + 1)) # solution to equation Bcomp = Bsamp(Bsamp-1)/2
   
-  # draw bootstrap samples
+  # ----- Draw bootstrap samples -----
+  
   l_ind <- list()
   l_dist <- list()
   l_clust <- list()
   for(b in 1:Bsamp) {
     l_ind[[b]] <-  sample(1:p, p, replace=T)
-    l_dist[[b]] <- dist[ l_ind[[b]],  l_ind[[b]]]
-    l_clust[[b]] <- fastcluster::hclust(as.dist(l_dist[[b]]), method='complete')
+    l_ind[[b]] <- l_ind[[b]][order(l_ind[[b]])] # order
+    l_dist[[b]] <- dist[ l_ind[[b]],  l_ind[[b]] ]
+    l_clust[[b]] <- fastcluster::hclust(as.dist(l_dist[[b]]), method=linkage)
   }
   
-  # all possible combinations
-  combs <- combn(1:Bsamp ,2)
+  
+  # ----- compute indices for each pair: which objects are in both samples? -----
+  
+  combs <- combn(1:Bsamp ,2) # All possible combinations
+  l_indices <- list()
+  for(bc in 1:Bcomp) {
+    # overlap
+    IS <- intersect(l_ind[[combs[1,bc]]],l_ind[[combs[2,bc]]])
+    l_pair <- list()
+    count <- 1
+    for(r in combs[,bc]) {
+      
+      ind_is_r1 <- l_ind[[r]] %in% IS # indicator: indice in both?
+      ind2_r1 <- !duplicated(l_ind[[r]])
+      ind3_r1 <- ind_is_r1 & ind2_r1
+      
+      #ind_is_r2 <- l_ind[[2]] %in% IS # indicator: indice in both?
+      #ind2_r2 <- !duplicated(l_ind[[2]])
+      #ind3_r2 <- ind_is_r2 & ind2_r2
+      
+      l_pair[[count]] <- ind3_r1
+      count<-count+1
+    }
+    l_indices[[bc]] <- l_pair
+  }
+  
+  #l_ind[[1]][l_indices[[1]][[1]]]
+  #l_ind[[2]][l_indices[[1]][[2]]]
+  
+  
+  # ----- Loop over first Bcomp comparisons -----
   
   if(pbar)  pb <- txtProgressBar(min=0, max=Bcomp, style = 2)
-
-  # loop over first Bcomp comparisons
+  
   for(bc in 1:Bcomp) {
     
-    # for k (most efficient nesting)
     for(k in kseq) {
-      
-      l_cl <- list()
-      l_pairwise <- list() # save pairwise assignment similarities
 
-      for(samp in combs[,bc]) {
-        # cut dendogram
-        l_cl[[samp]]  <- cutree(l_clust[[samp]], k)
-        
-        # get indicator matrix, entry 1 = same cluster
-        dm <- (as.matrix(dist(l_cl[[samp]]))==0)*1 
-        diag(dm) <- 0
-        colnames(dm) <- rownames(dm) <- l_ind[[samp]]
-        dm <- dm[order(l_ind[[samp]]), order(l_ind[[samp]])]
-        l_pairwise[[samp]] <- dm
+      l_cl <- list()
+      l_pairind <- list() # are two objects in same cluster (1 yes, 0 no)
+      count <- 1
+      for(r in combs[,bc]) {
+        cl_long  <- cutree(l_clust[[r]], k) # cut dendogram
+        l_cl[[count]] <- cl_long[l_indices[[bc]][[count]]] # only take the ones in the intersection set
+        l_pairind[[count]] <- (as.numeric(dist(l_cl[[count]]))==0)*1
+        count <- count+1
       }
+    
+      InStab <- mean(abs(l_pairind[[1]] - l_pairind[[2]])) 
       
-      # take intersection of objects in bi,bj
-      no_both <- (1:p)[(1:p %in% l_ind[[combs[1,bc]]]) & (1:p %in% l_ind[[combs[2,bc]]])]
-      
-      l_pairwise_short <- list()
-      for(samp in combs[,bc]) {
-        # subset
-        ind <- colnames(l_pairwise[[samp]]) %in% no_both
-        l_pairwise_short[[samp]] <- l_pairwise[[samp]][ind, ind]
-        # remove duplicates
-        dupl <- !duplicated(colnames(l_pairwise_short[[samp]]))
-        l_pairwise_short[[samp]] <- l_pairwise_short[[samp]][dupl, dupl]
-      }
-      
-      # compute instability
-      if(norm) {
-        #norm_val <- max(1,(sum(l_pairwise_short[[1]]) + sum(l_pairwise_short[[1]]) ) / 2)
-        tab1 <- as.numeric(table(l_cl[[combs[1,bc]]]))
-        tab2 <- as.numeric(table(l_cl[[combs[2,bc]]]))
-        
-        norm_val <- instab(tab1, tab2, 100)
-        
-        ind_mat1 <- l_pairwise_short[[combs[1,bc]]]
-        ind_mat2 <- l_pairwise_short[[combs[2,bc]]]
-        
-        scale_dim <- (dim(ind_mat1)[1] * (dim(ind_mat1)[1]-1)) / 2
-        
-        m_instab[bc,which(kseq==k)] <- sum(abs(ind_mat1 - ind_mat2)) / (norm_val*scale_dim) 
-        } else {
-        m_instab[bc,which(kseq==k)] <- mean(abs(l_pairwise_short[[combs[1,bc]]] - l_pairwise_short[[combs[1,bc]]])) 
+      # Normalize
+      if(norm==FALSE) {
+        m_instab[bc,which(kseq==k)] <- InStab
+      } else {
+        tb1 <- table(l_cl[[1]])
+        tb2 <- table(l_cl[[2]])
+        norm_val <- instab(tb1, tb2, 100)
+        m_instab[bc,which(kseq==k)] <- InStab/norm_val
       }
         
     } # end for k
   
     if(pbar) setTxtProgressBar(pb, bc)
   
-    
   } # end for B
   
-  stab <- colMeans(m_instab)
-  kopt <- which.min(stab[-1])+1
+  
+  
+  instabM <- colMeans(m_instab)
+  kopt <- which.min(instabM)+(min(kseq)-1)
 
   
-  outlist <- list('stabilities'=stab, 'kopt'=kopt)
+  outlist <- list('instabilities'=instabM, 'kopt'=kopt)
   
   return(outlist)
   

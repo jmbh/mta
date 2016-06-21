@@ -7,8 +7,8 @@ gap_statistic <- function(dist, # p x p distance matrix of
                           lambda = .7, 
                           bezier = NULL,
                           xcor = c(0,1,-1), # x-coordinates of start ,nonselected, selected box inthatorder
-                          ycor = c(0,1.5,1.5) # y-coordinates
-)
+                          ycor = c(0,1.5,1.5), # y-coordinates
+                          linkage = 'complete')
   
 {
   
@@ -72,7 +72,7 @@ gap_statistic <- function(dist, # p x p distance matrix of
       dist <- as.matrix(distobj)
     }
     
-    hc <- hclust(distobj, method = 'complete')
+    hc <- hclust(distobj, method = linkage)
     
     for(k in kseq) {
       

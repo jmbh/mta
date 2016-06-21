@@ -2,10 +2,9 @@
 library(MASS)
 library(cluster)
 
-s <- 1
-n <- 150
+s <- .3
+n <- 300
 kseq <- 1:20
-plot(data)
 l_stability <- l_gap <- l_jump <- l_slope <- list()
 
 l_res <- list()
@@ -16,16 +15,43 @@ for(j in 1:10) {
   
   # ---------- Generate Data ----------
   set.seed(j)
-  data <- rbind(cbind(rnorm(n, 1, s),rnorm(n, 0, s)),
-                cbind(rnorm(n, 1, s),rnorm(n, 1, s)),
-                cbind(rnorm(n, 0, s),rnorm(n, 1, s)),
-                cbind(rnorm(n, 0, s),rnorm(n, 0, s)))
   
-  #plot(data) # show data
+  data <- rbind(cbind(rnorm(n, 1, s),rnorm(n, 1, s)),
+                cbind(rnorm(n, 1, s),rnorm(n, 2.5, s)),
+                cbind(rnorm(n, 1, s),rnorm(n, 3, s)),
+                cbind(rnorm(n, 2, s),rnorm(n, 1, s)),
+                cbind(rnorm(n, 2, s),rnorm(n, 1.5, s)),
+                cbind(rnorm(n, 2, s),rnorm(n, 3, s)),
+                cbind(rnorm(n, 3, s),rnorm(n, 1, s)),
+                cbind(rnorm(n, 3, s),rnorm(n, 1.5, s)),
+                cbind(rnorm(n, 3, s),rnorm(n, 3, s)))
+  
+  plot(data) # show data
   #dim(data)
   dist <- distm <- as.matrix(dist(data)) # calc distance matrix
   
   # ---------- Call different Functions ----------
+  
+  kseq <- 2:20
+  C2 <- cluster_stability2(dist, kseq, Bcomp = 30, norm=TRUE)
+  C2_n <- cluster_stability2(dist, kseq, Bcomp = 30, norm=FALSE)
+ 
+  plot(kseq, C2$instabilities, ylim=c(0,.8), type='l')
+  lines(kseq, C2_n$instabilities, col='red')
+  abline(v=9, col='blue')
+  
+  
+  
+  
+  cluster_stability2
+  # speed testing
+  tt<-proc.time()[3]
+  set.seed(2)
+  C2 <- cluster_stability2(dist=distm, kseq = kseq, Bcomp = 10, norm = TRUE, pbar=FALSE)
+  C2
+  C2$instabilities
+  plot(C2$instabilities)
+  proc.time()[3]-tt
   
   # a) Cluster stability
   cl_a <- cluster_stability(dist=distm, kseq = kseq, B = 20, norm = FALSE)
