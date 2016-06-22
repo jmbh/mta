@@ -19,6 +19,19 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// rootChoose
+double rootChoose(int n, int k, double root);
+RcppExport SEXP mta_rootChoose(SEXP nSEXP, SEXP kSEXP, SEXP rootSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< double >::type root(rootSEXP);
+    __result = Rcpp::wrap(rootChoose(n, k, root));
+    return __result;
+END_RCPP
+}
 // f_rescale_c
 NumericMatrix f_rescale_c(NumericVector x, NumericVector y, int npts);
 RcppExport SEXP mta_f_rescale_c(SEXP xSEXP, SEXP ySEXP, SEXP nptsSEXP) {

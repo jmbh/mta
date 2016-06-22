@@ -2,8 +2,9 @@ useDynLib(mta)
 importFrom(Rcpp, evalCpp)
 importFrom(plyr, ddply)
 importFrom(plyr, dlply)
-importFrom(stats,as.dist)
+importFrom(stats, as.dist)
 importFrom(fastcluster, hclust)
+#importFrom(MASS, mvrnorm) for some reason i do not have to include this ...
 export(prepr, trajcluster, trajstats, gap_statistic, cluster_stability)
 
 

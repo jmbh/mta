@@ -1,4 +1,6 @@
 
+
+
 gap_statistic <- function(dist, # p x p distance matrix of
                           kseq, #sequence of ks to be checked 
                           steps=10, # number of points on synthetic curves

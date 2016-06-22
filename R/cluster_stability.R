@@ -1,7 +1,5 @@
 
-
-
-cluster_stability2 <- function(dist, # p x p distance matrix 
+cluster_stability <- function(dist, # p x p distance matrix 
                               kseq, # sequence of ks tested
                               Bcomp = 10, # number of bootstrap comparisons
                               norm = FALSE, # norm over pw equal assign,FALSE=as in Wang etal

@@ -5,6 +5,10 @@ distmat <- function(id, x, y, n) {
     .Call('mta_distmat', PACKAGE = 'mta', id, x, y, n)
 }
 
+rootChoose <- function(n, k, root) {
+    .Call('mta_rootChoose', PACKAGE = 'mta', n, k, root)
+}
+
 f_rescale_c <- function(x, y, npts) {
     .Call('mta_f_rescale_c', PACKAGE = 'mta', x, y, npts)
 }
