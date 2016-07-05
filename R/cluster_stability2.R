@@ -98,8 +98,8 @@ cluster_stability2 <- function(x, # n x p data matrix
         if(norm==FALSE) {
           m_instab[bc,which(kseq==k)] <- InStab
         } else {
-          tb1 <- table(l_cl[[1]])
-          tb2 <- table(l_cl[[2]])
+          tb1 <- table(cl_a)
+          tb2 <- table(cl_b)
           norm_val <- instab(tb1, tb2, 100)
           m_instab[bc,which(kseq==k)] <- InStab/norm_val
         }
