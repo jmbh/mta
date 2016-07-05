@@ -1,10 +1,6 @@
 #from: http://stackoverflow.com/questions/31074113/cluster-unseen-points-using-spectral-clustering
 
 
-
-S <- SpectralClust(train, k=k, test=test) #make predictions
-
-
 SpectralClust <- function(train, k, test) {
   
   ##The paper gives great instructions on how to perform spectral clustering

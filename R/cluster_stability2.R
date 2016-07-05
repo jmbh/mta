@@ -1,33 +1,27 @@
 
 
 # dummy input
-set.seed(1)
-data <- shapes.two.moon(200)$data
-ind <- sample(c(TRUE,FALSE), 200, replace = T)
-train <- data[ind,]
-test <- data[!ind,]
-k <- 2
+#set.seed(1)
+#data <- shapes.two.moon(200)$data
+#ind <- sample(c(TRUE,FALSE), 200, replace = T)
+#train <- data[ind,]
+#test <- data[!ind,]
 
-x <- data
-
-
-Bcomp <- 10
-kseq <- 2:10
-norm <- TRUE
+#x <- data
+#Bcomp <- 10
+#kseq <- 2:10
+#norm <- TRUE
 
 # testing function
 
-p0 <- cluster_stability2(x, kseq, norm=FALSE, prediction=FALSE, type='spectral')
-p0
+#p0 <- cluster_stability2(x, kseq, norm=FALSE, prediction=FALSE, type='spectral')
+#p0 <- cluster_stability2(x, kseq, norm=FALSE, prediction=FALSE, type='spectral')
 
-plot(kseq,p0$instabilities)
+#p0
 
-#p1 <- cluster_stability2(x, 2:10, norm=FALSE, prediction=TRUE)
+#plot(kseq,p0$instabilities)
 
-#plot(p0$instabilities, type='l', col='red', ylim=c(0,.4))
-#lines(p1$instabilities)
 
-# runs with k-means only
 
 cluster_stability2 <- function(x, # n x p data matrix 
                                kseq, # sequence of ks tested
