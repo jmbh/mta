@@ -3,6 +3,7 @@ cluster_stability <- function(dist, # p x p distance matrix
                               kseq, # sequence of ks tested
                               Bcomp = 10, # number of bootstrap comparisons
                               norm = FALSE, # norm over pw equal assign,FALSE=as in Wang etal
+                              prediction = TRUE, # use prediction approach, if FALSE, use brute pair in equal cluster approach
                               pbar = TRUE,
                               linkage='complete',
                               ...) # other arguments passed to hclust
