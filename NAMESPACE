@@ -5,7 +5,7 @@ importFrom(plyr, dlply)
 importFrom(stats, as.dist)
 importFrom(fastcluster, hclust)
 #importFrom(MASS, mvrnorm) for some reason i do not have to include this ...
-export(prepr, trajcluster, trajstats, gap_statistic, cluster_stability)
+export(prepr, trajcluster, trajstats, gap_statistic, cluster_stability, cluster_stability2)
 
 
 # S3method(print, mta)
