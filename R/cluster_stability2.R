@@ -1,20 +1,22 @@
 
 
 # dummy input
-#set.seed(1)
-#data <- shapes.two.moon(200)$data
-#ind <- sample(c(TRUE,FALSE), 200, replace = T)
-#train <- data[ind,]
-#test <- data[!ind,]
+library(clusterSim)
+library(flexclust)
+set.seed(1)
+data <- shapes.two.moon(200)$data
+ind <- sample(c(TRUE,FALSE), 200, replace = T)
+train <- data[ind,]
+test <- data[!ind,]
 
-#x <- data
-#Bcomp <- 10
-#kseq <- 2:10
-#norm <- TRUE
+x <- data
+Bcomp <- 10
+kseq <- 2:10
+norm <- TRUE
 
 # testing function
 
-#p0 <- cluster_stability2(x, kseq, norm=FALSE, prediction=FALSE, type='spectral')
+p0 <- cluster_stability2(x, kseq, norm=FALSE, prediction=FALSE, type='kmeans')
 #p0 <- cluster_stability2(x, kseq, norm=FALSE, prediction=FALSE, type='spectral')
 
 #p0
@@ -91,7 +93,7 @@ cluster_stability2 <- function(x, # n x p data matrix
           l_km_models <- list()
           count <- 1
           for(r in combs[,bc]) {
-            km_model <- kcca(x[l_ind[[r]],], k=k, kccaFamily("kmeans")) #save whole model
+            km_model <- flexclust::kcca(x[l_ind[[r]],], k=k, kccaFamily("kmeans")) #save whole model
             l_clust[[count]] <-  predict(km_model, newdata=x)  #make predictions
             count <- count+1
           }
@@ -130,7 +132,7 @@ cluster_stability2 <- function(x, # n x p data matrix
           l_pairind <- list() # are two objects in same cluster (1 yes, 0 no)
           count <- 1
           for(r in combs[,bc]) {
-            cl_long <- kcca(x[l_ind[[r]],], k=k, kccaFamily("kmeans"))@second
+            cl_long <- flexclust::kcca(x[l_ind[[r]],], k=k, kccaFamily("kmeans"))@second
             l_cl[[count]] <- cl_long[l_indices[[bc]][[count]]] # only take the ones in the intersection set
             l_pairind[[count]] <- (as.numeric(dist(l_cl[[count]]))==0)*1
             count <- count+1
