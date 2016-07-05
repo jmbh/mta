@@ -1,22 +1,22 @@
 
 
 # dummy input
-library(clusterSim)
-library(flexclust)
-set.seed(1)
-data <- shapes.two.moon(200)$data
-ind <- sample(c(TRUE,FALSE), 200, replace = T)
-train <- data[ind,]
-test <- data[!ind,]
-
-x <- data
-Bcomp <- 10
-kseq <- 2:10
-norm <- TRUE
+# library(clusterSim)
+# library(flexclust)
+# set.seed(1)
+# data <- shapes.two.moon(200)$data
+# ind <- sample(c(TRUE,FALSE), 200, replace = T)
+# train <- data[ind,]
+# test <- data[!ind,]
+# 
+# x <- data
+# Bcomp <- 10
+# kseq <- 2:10
+# norm <- TRUE
 
 # testing function
 
-p0 <- cluster_stability2(x, kseq, norm=FALSE, prediction=FALSE, type='kmeans')
+# p0 <- cluster_stability2(x, kseq, norm=FALSE, prediction=FALSE, type='kmeans')
 #p0 <- cluster_stability2(x, kseq, norm=FALSE, prediction=FALSE, type='spectral')
 
 #p0
