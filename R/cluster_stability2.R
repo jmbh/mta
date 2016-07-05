@@ -1,14 +1,27 @@
 
 
 # dummy input
-#x <- dat
-#Bcomp <- 10
-#kseq <- 2:10
-#norm <- TRUE
+set.seed(1)
+data <- shapes.two.moon(200)$data
+ind <- sample(c(TRUE,FALSE), 200, replace = T)
+train <- data[ind,]
+test <- data[!ind,]
+k <- 2
+
+x <- data
+
+
+Bcomp <- 10
+kseq <- 2:10
+norm <- TRUE
 
 # testing function
 
-#p0 <- cluster_stability2(x, 2:10, norm=FALSE, prediction=FALSE)
+p0 <- cluster_stability2(x, kseq, norm=FALSE, prediction=FALSE, type='spectral')
+p0
+
+plot(kseq,p0$instabilities)
+
 #p1 <- cluster_stability2(x, 2:10, norm=FALSE, prediction=TRUE)
 
 #plot(p0$instabilities, type='l', col='red', ylim=c(0,.4))
@@ -21,6 +34,7 @@ cluster_stability2 <- function(x, # n x p data matrix
                                Bcomp = 10, # number of bootstrap comparisons
                                norm = FALSE, # norm over pw equal assign,FALSE=as in Wang etal
                                prediction = TRUE, # use prediction approach, if FALSE, use brute pair in equal cluster approach
+                               type = 'kmeans', # or 'spectral'
                                pbar = TRUE,
                                ...) # other arguments passed to hclust
 {
@@ -74,22 +88,32 @@ cluster_stability2 <- function(x, # n x p data matrix
     
     for(k in kseq) {
       
+      l_clust <- list()
+      
       if(prediction) {
         
-        l_km_models <- list()
-        count <- 1
-        for(r in combs[,bc]) {
-          l_km_models[[count]] <- kcca(x[l_ind[[r]],], k=k, kccaFamily("kmeans")) #save whole mode
-          count <- count+1
+        # kmeans or spectral clustering?
+        if(type=='kmeans') {
+          l_km_models <- list()
+          count <- 1
+          for(r in combs[,bc]) {
+            km_model <- kcca(x[l_ind[[r]],], k=k, kccaFamily("kmeans")) #save whole model
+            l_clust[[count]] <-  predict(km_model, newdata=x)  #make predictions
+            count <- count+1
+          }
+        } else {
+        
+          count <- 1
+          for(r in combs[,bc]) { 
+            l_clust[[count]] <- SpectralClust(train=as.matrix(x[l_ind[[r]],]), k=k, test=x) #make predictions
+            count <- count+1
+          }
+          
         }
         
-        # make predictions
-        cl_a <- predict <- predict(l_km_models[[1]], newdata=x)
-        cl_b <- predict <- predict(l_km_models[[2]], newdata=x)
-        
         # count pairwise equal assignments
-        same_a <- as.numeric(dist(cl_a)==0)*1
-        same_b <- as.numeric(dist(cl_b)==0)*1
+        same_a <- as.numeric(dist(l_clust[[1]])==0)*1
+        same_b <- as.numeric(dist(l_clust[[2]])==0)*1
         
         # compute Instability
         InStab <- mean(abs(same_a - same_b)) 
@@ -104,17 +128,29 @@ cluster_stability2 <- function(x, # n x p data matrix
           m_instab[bc,which(kseq==k)] <- InStab/norm_val
         }
         
-        
+        # else: no prediction
       } else {
         
-        l_cl <- list()
-        l_pairind <- list() # are two objects in same cluster (1 yes, 0 no)
-        count <- 1
-        for(r in combs[,bc]) {
-          cl_long <- kcca(x[l_ind[[r]],], k=k, kccaFamily("kmeans"))@second
-          l_cl[[count]] <- cl_long[l_indices[[bc]][[count]]] # only take the ones in the intersection set
-          l_pairind[[count]] <- (as.numeric(dist(l_cl[[count]]))==0)*1
-          count <- count+1
+        if(type=='kmeans') {
+          l_cl <- list()
+          l_pairind <- list() # are two objects in same cluster (1 yes, 0 no)
+          count <- 1
+          for(r in combs[,bc]) {
+            cl_long <- kcca(x[l_ind[[r]],], k=k, kccaFamily("kmeans"))@second
+            l_cl[[count]] <- cl_long[l_indices[[bc]][[count]]] # only take the ones in the intersection set
+            l_pairind[[count]] <- (as.numeric(dist(l_cl[[count]]))==0)*1
+            count <- count+1
+          } 
+        } else { # if type = 'spectral'
+          l_cl <- list()
+          l_pairind <- list() # are two objects in same cluster (1 yes, 0 no)
+          count <- 1
+          for(r in combs[,bc]) {
+            cl_long <- SpectralClust(train=as.matrix(x[l_ind[[r]],]), k=k, test=NULL)
+            l_cl[[count]] <- cl_long[l_indices[[bc]][[count]]] # only take the ones in the intersection set
+            l_pairind[[count]] <- (as.numeric(dist(l_cl[[count]]))==0)*1
+            count <- count+1
+          } 
         }
         
         InStab <- mean(abs(l_pairind[[1]] - l_pairind[[2]])) 
@@ -137,11 +173,9 @@ cluster_stability2 <- function(x, # n x p data matrix
     
   } # end for B
   
-  
-  
+
   instabM <- colMeans(m_instab)
   kopt <- which.min(instabM)+(min(kseq)-1)
-  
   
   outlist <- list('instabilities'=instabM, 'kopt'=kopt)
   

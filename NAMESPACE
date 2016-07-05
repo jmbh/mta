@@ -4,6 +4,8 @@ importFrom(plyr, ddply)
 importFrom(plyr, dlply)
 importFrom(stats, as.dist)
 importFrom(fastcluster, hclust)
+importFrom(flexclust, kcca)
+
 #importFrom(MASS, mvrnorm) for some reason i do not have to include this ...
 export(prepr, trajcluster, trajstats, gap_statistic, cluster_stability, cluster_stability2)
 
