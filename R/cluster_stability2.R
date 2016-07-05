@@ -1,18 +1,18 @@
 
 
 # dummy input
-x <- dat
-Bcomp <- 10
-kseq <- 2:10
-norm <- TRUE
+#x <- dat
+#Bcomp <- 10
+#kseq <- 2:10
+#norm <- TRUE
 
 # testing function
 
-p0 <- cluster_stability2(x, 2:10, norm=FALSE, prediction=FALSE)
-p1 <- cluster_stability2(x, 2:10, norm=FALSE, prediction=TRUE)
+#p0 <- cluster_stability2(x, 2:10, norm=FALSE, prediction=FALSE)
+#p1 <- cluster_stability2(x, 2:10, norm=FALSE, prediction=TRUE)
 
-plot(p0$instabilities, type='l', col='red', ylim=c(0,.4))
-lines(p1$instabilities)
+#plot(p0$instabilities, type='l', col='red', ylim=c(0,.4))
+#lines(p1$instabilities)
 
 # runs with k-means only
 
