@@ -1,28 +1,21 @@
-
-
-# dummy input
-# library(clusterSim)
 # library(flexclust)
-# set.seed(1)
-# data <- shapes.two.moon(200)$data
-# ind <- sample(c(TRUE,FALSE), 200, replace = T)
-# train <- data[ind,]
-# test <- data[!ind,]
 # 
+
+# n <- 1000
+# s <- .2
+# set.seed(1)
+# data <- rbind(cbind(rnorm(n, 0, s), rnorm(n, 3, s)),
+#               cbind(rnorm(n, 1, s), rnorm(n, 0, s)),
+#               cbind(rnorm(n, 2, s), rnorm(n, 2, s)))
 # x <- data
 # Bcomp <- 10
-# kseq <- 2:10
-# norm <- TRUE
-
-# testing function
-
-# p0 <- cluster_stability2(x, kseq, norm=FALSE, prediction=FALSE, type='kmeans')
-#p0 <- cluster_stability2(x, kseq, norm=FALSE, prediction=FALSE, type='spectral')
-
-#p0
-
-#plot(kseq,p0$instabilities)
-
+# kseq <- 40:50
+# 
+# t1 <- proc.time()[3]
+# # testing function
+# p0 <- cluster_stability2(x, kseq, norm=TRUE, prediction=TRUE, type='kmeans')
+# proc.time()[3] - t1
+# 
 
 
 cluster_stability2 <- function(x, # n x p data matrix 
@@ -50,10 +43,12 @@ cluster_stability2 <- function(x, # n x p data matrix
     l_ind[[b]] <- l_ind[[b]][order(l_ind[[b]])] # order
   }
   
+  combs <- combn(1:Bsamp ,2) # All possible combinations
   
   # ----- compute indices for each pair: which objects are in both samples? -----
-  
-  combs <- combn(1:Bsamp ,2) # All possible combinations
+
+  # only necessary for intersection approach
+  if(!prediction) {
   l_indices <- list()
   for(bc in 1:Bcomp) {
     # overlap
@@ -70,6 +65,7 @@ cluster_stability2 <- function(x, # n x p data matrix
       count<-count+1
     }
     l_indices[[bc]] <- l_pair
+  }
   }
   
   #l_ind[[1]][l_indices[[1]][[1]]]

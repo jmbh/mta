@@ -32,6 +32,55 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// rootChooseLookup
+double rootChooseLookup(int n, int k, std::vector<double> lookup);
+RcppExport SEXP mta_rootChooseLookup(SEXP nSEXP, SEXP kSEXP, SEXP lookupSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< std::vector<double> >::type lookup(lookupSEXP);
+    __result = Rcpp::wrap(rootChooseLookup(n, k, lookup));
+    return __result;
+END_RCPP
+}
+// lookup
+std::vector<double> lookup(int n, double root);
+RcppExport SEXP mta_lookup(SEXP nSEXP, SEXP rootSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< double >::type root(rootSEXP);
+    __result = Rcpp::wrap(lookup(n, root));
+    return __result;
+END_RCPP
+}
+// rootCombLookup
+double rootCombLookup(std::vector<double> ns, std::vector<double> lookup);
+RcppExport SEXP mta_rootCombLookup(SEXP nsSEXP, SEXP lookupSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< std::vector<double> >::type ns(nsSEXP);
+    Rcpp::traits::input_parameter< std::vector<double> >::type lookup(lookupSEXP);
+    __result = Rcpp::wrap(rootCombLookup(ns, lookup));
+    return __result;
+END_RCPP
+}
+// stabExp
+double stabExp(std::vector<double> ns, std::vector<double> lookup);
+RcppExport SEXP mta_stabExp(SEXP nsSEXP, SEXP lookupSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< std::vector<double> >::type ns(nsSEXP);
+    Rcpp::traits::input_parameter< std::vector<double> >::type lookup(lookupSEXP);
+    __result = Rcpp::wrap(stabExp(ns, lookup));
+    return __result;
+END_RCPP
+}
 // f_rescale_c
 NumericMatrix f_rescale_c(NumericVector x, NumericVector y, int npts);
 RcppExport SEXP mta_f_rescale_c(SEXP xSEXP, SEXP ySEXP, SEXP nptsSEXP) {

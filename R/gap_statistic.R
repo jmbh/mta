@@ -1,16 +1,15 @@
 
 
 
-gap_statistic <- function(dist, # p x p distance matrix of
+gap_statistic <- function(x, # n x p data matrix
                           kseq, #sequence of ks to be checked 
-                          steps=10, # number of points on synthetic curves
-                          method='gauss', # 'bezier' for bezier curves, 'gauss' for a multivariate gaussian with cov=0, matching the dimension
+                          steps = 10, # number of points on synthetic curves
+                          method = 'unif', # 'bezier' for bezier curves, 'gauss' for a multivariate gaussian with cov=0, matching the dimension
                           dim = NULL,
                           lambda = .7, 
                           bezier = NULL,
                           xcor = c(0,1,-1), # x-coordinates of start ,nonselected, selected box inthatorder
-                          ycor = c(0,1.5,1.5), # y-coordinates
-                          linkage = 'complete')
+                          ycor = c(0,1.5,1.5)) # y-coordinates
   
 {
   
@@ -21,10 +20,8 @@ gap_statistic <- function(dist, # p x p distance matrix of
     t = seq(0,1,length = resol)           #Resolution
     B = cbind( (1-t)^2, 2*t*(1-t),t^2 )   #Bernstein
     
-    bx = ( B[,1] * x[1] + w * B[,2] * x[2] + B[,3] * x[3] ) / 
-      ( B[,1]        + w * B[,2]        + B[,3]) 
-    by = ( B[,1] * y[1] + w * B[,2] * y[2] + B[,3] * y[3] ) / 
-      ( B[,1]        + w * B[,2]        + B[,3]) 
+    bx = ( B[,1] * x[1] + w * B[,2] * x[2] + B[,3] * x[3] ) /  (B[,1] + w * B[,2] + B[,3]) 
+    by = ( B[,1] * y[1] + w * B[,2] * y[2] + B[,3] * y[3] ) /  (B[,1] + w * B[,2] + B[,3]) 
     
     return(data.frame('x'=bx,'y'=by))
   }
@@ -50,14 +47,13 @@ gap_statistic <- function(dist, # p x p distance matrix of
     
   } else {
     
-    Sigma <- matrix(0, dim, dim)
-    diag(Sigma) <- 1
-    mu <- rep(0, dim)
-    syn_data <- mvrnorm(n, mu, Sigma)
+    unif_dims <- list()
+    for(i in 1:dim) unif_dims[[i]] <- runif(n, unifdims[i,1], unifdims[i,2])
+    data_synt <- do.call(cbind, unif_dims)
     
   }
   
-  # ----- run hierarchical clustering -----
+  # ----- run k-means clustering -----
   
   empty_list <- vector('list', length=length(kseq))
   l_real <- list('clusters'=empty_list, 'WCD'=empty_list)
@@ -67,16 +63,15 @@ gap_statistic <- function(dist, # p x p distance matrix of
   
   for(type in 1:2) { # 1=real, 2=synthetic
     
-    if(type==1) { # data has to come first, because we then overwrite 'dist'
-      distobj <- as.dist(dist)
+    if(type==1) {
+      data = x
     } else {
-      distobj <- dist(syn_data)
-      dist <- as.matrix(distobj)
+      data = data_synt
     }
     
-    hc <- hclust(distobj, method = linkage)
-    
     for(k in kseq) {
+      
+      km_model <- flexclust::kcca(data, k=k, kccaFamily("kmeans")) #save whole model
       
       l_all[[type]][[1]][[k]] <- cl <- cutree(hc, k) # cut tree & define cluster
       # compute mean within cluster dissimilarity

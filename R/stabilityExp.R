@@ -1,7 +1,13 @@
 
 
+
+
 #require(Rcpp)
-#sourceCpp('~/Dropbox (2.0)/Work/Projects/Mousetracking/0 Discontinuous mind/4.1 ExploratoryHelpers/Stability2.0/rootChoose.cpp')
+#sourceCpp('/Users/jmb/Dropbox/MyData/_PhD/__software/mta/src/rootChoose.cpp')
+
+#lookupTab = lookup(100,10000)
+#rootChooseLookup(22,2,lookupTab)
+#rootChooseLookup(101,2,lookupTab)**1000
 
 rootComb = function(x,root = 1){ 
   n  = sum(x)
@@ -14,7 +20,6 @@ rootComb = function(x,root = 1){
   return(co)
   }
 
-
 stabilityExp = function(x,root = 1){
   co  = 0
   n  = sum(x)
@@ -23,6 +28,7 @@ stabilityExp = function(x,root = 1){
     k = x[i]
     if(k > 1){
       rootCo     = rootChoose(n-2,k-2,root) * rootComb(x[-i],root)
+      #print(rootCo)
       normRootCo = rootCo / totComb
       normCo     = normRootCo ** root
       co = co + normCo
@@ -30,6 +36,17 @@ stabilityExp = function(x,root = 1){
     }
   return(co)
   }
+
+#stabilityExp(c(2,3,2,3),10)
+#stabExp(c(2,3,2,3),lookup(100,10))
+
+
+#rootComb(c(2,3,2,3),10)
+#rootCombLookup(c(2,3,2,3),lookup(100,10))
+
+# rootChooseLookup(2,0,lookup(100,10))
+# rootChoose(25,2,10)
+
 
 
 instab = function(x,y,root){

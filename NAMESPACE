@@ -1,4 +1,6 @@
+
 useDynLib(mta)
+
 importFrom(Rcpp, evalCpp)
 importFrom(plyr, ddply)
 importFrom(plyr, dlply)
@@ -7,7 +9,7 @@ importFrom(fastcluster, hclust)
 #importFrom(flexclust, kcca)
 
 #importFrom(MASS, mvrnorm) for some reason i do not have to include this ...
-export(prepr, trajcluster, trajstats, gap_statistic, cluster_stability, cluster_stability2)
+export(prepr, trajcluster, trajstats, gap_statistic, cluster_stability, cluster_stability2, gap_statistic2)
 
 
 # S3method(print, mta)
