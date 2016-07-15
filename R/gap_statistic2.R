@@ -1,21 +1,26 @@
 
-
-x <- data
-
 gap_statistic2 <- function(x, # n x p data matrix
                            kseq) #sequence of ks to be checked 
 {
   
   # ----- aux functionS -----
-  
+
   getWCFandSil <- function(x, k, type='data') {
     
     # clustering
     if(k==1) {
       cl <- rep(1,nrow(x))
     } else {
-      km_model <- flexclust::kcca(x, k=k, kccaFamily("kmeans"))
-      cl <- km_model@cluster
+      check_k <- FALSE
+      counter <- 0
+      while(check_k == FALSE) {
+        km_model <- kmeans(x = x, centers = k)
+        cl <- km_model$cluster 
+        if(length(unique(cl))==k) check_k <- TRUE
+        counter <- counter + 1
+        if(counter>100) stop(paste0('k means solution with ', k, 'centers always converges to solution with empty cluster.'))
+      }
+
     }
     # calc distance matric
     dmat <- as.matrix(dist(x))
