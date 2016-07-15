@@ -1,24 +1,24 @@
 
 
+x <- data
+
 gap_statistic2 <- function(x, # n x p data matrix
-                           kseq, #sequence of ks to be checked 
-                           method = 'unif') # y-coordinates
-  
+                           kseq) #sequence of ks to be checked 
 {
   
   # ----- aux functionS -----
   
-  getWCFandSil <- function(data, k, type='data') {
+  getWCFandSil <- function(x, k, type='data') {
     
     # clustering
     if(k==1) {
-      cl <- rep(1,nrow(data))
+      cl <- rep(1,nrow(x))
     } else {
-      km_model <- flexclust::kcca(data, k=k, kccaFamily("kmeans"))
+      km_model <- flexclust::kcca(x, k=k, kccaFamily("kmeans"))
       cl <- km_model@cluster
     }
     # calc distance matric
-    dmat <- as.matrix(dist(data))
+    dmat <- as.matrix(dist(x))
     
     # calc within cluster dissimilarity
     l_diss <- list()
@@ -70,7 +70,7 @@ gap_statistic2 <- function(x, # n x p data matrix
     l_Sil[[k]] <- obj$Sil
   }
   l_WCD_data <- unlist(l_WCD_data)
-  l_Sil <- unlist(l_Sil)[-1]
+  l_Sil <- unlist(l_Sil)
   
   # Then: Synthetic Data
   l_WCD_syndata_runs <- list()
@@ -96,7 +96,7 @@ gap_statistic2 <- function(x, # n x p data matrix
   
   # Also Compute JUMP Statistic
   WCD_transf <- l_WCD_data^(- dims/2)
-  jump <- (WCD_transf - c(0,WCD_transf[-length(WCD_transf)]))[-1]
+  jump <- (WCD_transf - c(0, WCD_transf[-length(WCD_transf)]))[-1]
   k_jump <- which.max(jump) + 1
   
   # Compute Slope Statistic
