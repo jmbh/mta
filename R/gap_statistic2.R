@@ -1,4 +1,5 @@
 
+
 gap_statistic2 <- function(x, # n x p data matrix
                            kseq) #sequence of ks to be checked 
 {
@@ -102,7 +103,7 @@ gap_statistic2 <- function(x, # n x p data matrix
   # Also Compute JUMP Statistic
   WCD_transf <- l_WCD_data^(- dims/2)
   jump <- (WCD_transf - c(0, WCD_transf[-length(WCD_transf)]))[-1]
-  k_jump <- which.max(jump) + 1
+  k_jump <- which.max(jump)
   
   # Compute Slope Statistic
   sil <- l_Sil

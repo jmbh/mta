@@ -1,22 +1,3 @@
-# library(flexclust)
-# 
-
-# n <- 1000
-# s <- .2
-# set.seed(1)
-# data <- rbind(cbind(rnorm(n, 0, s), rnorm(n, 3, s)),
-#               cbind(rnorm(n, 1, s), rnorm(n, 0, s)),
-#               cbind(rnorm(n, 2, s), rnorm(n, 2, s)))
-# x <- data
-# Bcomp <- 10
-# kseq <- 40:50
-# 
-# t1 <- proc.time()[3]
-# # testing function
-# p0 <- cluster_stability2(x, kseq, norm=TRUE, prediction=TRUE, type='kmeans')
-# proc.time()[3] - t1
-# 
-
 
 cluster_stability2 <- function(x, # n x p data matrix 
                                kseq, # sequence of ks tested
@@ -25,7 +6,7 @@ cluster_stability2 <- function(x, # n x p data matrix
                                prediction = TRUE, # use prediction approach, if FALSE, use brute pair in equal cluster approach
                                type = 'kmeans', # or 'spectral'
                                pbar = TRUE,
-                               ...) # other arguments passed to hclust
+                               kmIter = 10) # number of reruns of k-means algorithm 
 {
   
   # Input checks
@@ -84,6 +65,9 @@ cluster_stability2 <- function(x, # n x p data matrix
       
       if(prediction) {
         
+        km_list <- list()
+        for(km in 1:kmIter) {
+        
         # kmeans or spectral clustering?
         if(type=='kmeans') {
           l_km_models <- list()
@@ -108,7 +92,11 @@ cluster_stability2 <- function(x, # n x p data matrix
         same_b <- as.numeric(dist(l_clust[[2]])==0)*1
         
         # compute Instability
-        InStab <- mean(abs(same_a - same_b)) 
+        km_list[[km]] <- mean(abs(same_a - same_b)) 
+        
+        }
+        
+        InStab <- km_list[[which.min(km_list)]]
         
         # Normalize
         if(norm==FALSE) {
@@ -122,6 +110,9 @@ cluster_stability2 <- function(x, # n x p data matrix
         
         # else: no prediction
       } else {
+        
+        km_list <- list()
+        for(km in 1:kmIter) {
         
         if(type=='kmeans') {
           l_cl <- list()
@@ -144,8 +135,13 @@ cluster_stability2 <- function(x, # n x p data matrix
             count <- count+1
           } 
         }
+
+        # compute Instability
+        km_list[[km]] <- mean(abs(l_pairind[[1]] - l_pairind[[2]])) 
         
-        InStab <- mean(abs(l_pairind[[1]] - l_pairind[[2]])) 
+        }
+        
+        InStab <- km_list[[which.min(km_list)]]
         
         # Normalize
         if(norm==FALSE) {
