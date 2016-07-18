@@ -65,15 +65,19 @@ cluster_stability2 <- function(x, # n x p data matrix
       
       if(prediction) {
         
-        km_list <- list()
-        for(km in 1:kmIter) {
-        
         # kmeans or spectral clustering?
         if(type=='kmeans') {
           l_km_models <- list()
           count <- 1
           for(r in combs[,bc]) {
-            km_model <- flexclust::kcca(x[l_ind[[r]],], k=k, kccaFamily("kmeans")) #save whole model
+            
+            l_km <- list()
+            for(km in 1:kmIter) {
+              l_km[[km]] <- flexclust::kcca(x[l_ind[[r]],], k=k, kccaFamily("kmeans")) #save whole model  
+            }
+            
+            WCD <- unlist(lapply(l_km, function(x) mean(x@clusinfo$av_dist)))
+            km_model <- l_km[[which.min(WCD)]] # pick k-means clustering with smallest WCD
             l_clust[[count]] <-  predict(km_model, newdata=x)  #make predictions
             count <- count+1
           }
@@ -92,15 +96,11 @@ cluster_stability2 <- function(x, # n x p data matrix
         same_b <- as.numeric(dist(l_clust[[2]])==0)*1
         
         # compute Instability
-        km_list[[km]] <- mean(abs(same_a - same_b)) 
-        
-        }
-        
-        InStab <- km_list[[which.min(km_list)]]
+        InStab <- mean(abs(same_a - same_b)) 
         
         # Normalize
         if(norm==FALSE) {
-          m_instab[bc,which(kseq==k)] <- InStab
+          m_instab[bc, which(kseq==k)] <- InStab
         } else {
           tb1 <- table(l_clust[[1]])
           tb2 <- table(l_clust[[2]])
@@ -111,15 +111,22 @@ cluster_stability2 <- function(x, # n x p data matrix
         # else: no prediction
       } else {
         
-        km_list <- list()
-        for(km in 1:kmIter) {
-        
         if(type=='kmeans') {
           l_cl <- list()
           l_pairind <- list() # are two objects in same cluster (1 yes, 0 no)
           count <- 1
           for(r in combs[,bc]) {
-            cl_long <- flexclust::kcca(x[l_ind[[r]],], k=k, kccaFamily("kmeans"))@second
+            
+            # run k means several times
+            l_km <- list()
+            for(km in 1:kmIter) {
+              l_km[[km]] <- flexclust::kcca(x[l_ind[[r]],], k=k, kccaFamily("kmeans")) #save whole model  
+            }
+            WCD <- unlist(lapply(l_km, function(x) mean(x@clusinfo$av_dist)))
+            km_model <- l_km[[which.min(WCD)]] # pick k-means clustering with smallest WCD
+            
+            cl_long <- km_model@cluster
+            
             l_cl[[count]] <- cl_long[l_indices[[bc]][[count]]] # only take the ones in the intersection set
             l_pairind[[count]] <- (as.numeric(dist(l_cl[[count]]))==0)*1
             count <- count+1
@@ -137,11 +144,8 @@ cluster_stability2 <- function(x, # n x p data matrix
         }
 
         # compute Instability
-        km_list[[km]] <- mean(abs(l_pairind[[1]] - l_pairind[[2]])) 
+        InStab <- mean(abs(l_pairind[[1]] - l_pairind[[2]])) 
         
-        }
-        
-        InStab <- km_list[[which.min(km_list)]]
         
         # Normalize
         if(norm==FALSE) {
