@@ -167,9 +167,10 @@ cluster_stability2 <- function(x, # n x p data matrix
   
 
   instabM <- colMeans(m_instab)
+  instabMedian <- apply(m_instab, 2, median)
   kopt <- which.min(instabM)+(min(kseq)-1)
   
-  outlist <- list('instabilities'=instabM, 'kopt'=kopt)
+  outlist <- list('instabilities'=instabM, 'kopt'=kopt, 'instabilities_median'=instabMedian)
   
   return(outlist)
   
