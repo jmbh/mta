@@ -1,8 +1,9 @@
 
 
 gap_statistic2 <- function(x, # n x p data matrix
-                           kseq) #sequence of ks to be checked 
-{
+                           kseq, #sequence of ks to be checked 
+                           kmIter) # restarts of k means algorithm
+{ 
   
   # ----- aux functionS -----
 
@@ -15,14 +16,25 @@ gap_statistic2 <- function(x, # n x p data matrix
       check_k <- FALSE
       counter <- 0
       while(check_k == FALSE) {
-        km_model <- kmeans(x = x, centers = k)
-        cl <- km_model$cluster 
+        
+        # re-start k means algorithm a couple of times
+        l_km <- list()
+        for(km in 1:kmIter) {
+          l_km[[km]] <- flexclust::kcca(x, k=k, kccaFamily("kmeans")) #save whole model  
+        }
+        
+        WCD <- unlist(lapply(l_km, function(x) mean(x@clusinfo$av_dist)))
+        km_model <- l_km[[which.min(WCD)]] # pick k-means clustering with smallest WCD
+        
+        cl <- km_model@cluster
+        
         if(length(unique(cl))==k) check_k <- TRUE
         counter <- counter + 1
         if(counter>100) stop(paste0('k means solution with ', k, 'centers always converges to solution with empty cluster.'))
       }
 
     }
+    
     # calc distance matric
     dmat <- as.matrix(dist(x))
     
