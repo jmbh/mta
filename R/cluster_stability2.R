@@ -1,4 +1,14 @@
 
+
+x <- f_circular(1, 100, 1, 3, c(.1, .1), dims=2)
+kseq=2:25
+Bcomp = 10
+prediction = TRUE
+type = 'kmeans'
+pbar = TRUE
+kmIter = 3
+norm =TRUE
+
 cluster_stability2 <- function(x, # n x p data matrix 
                                kseq, # sequence of ks tested
                                Bcomp = 10, # number of bootstrap comparisons
@@ -9,9 +19,15 @@ cluster_stability2 <- function(x, # n x p data matrix
                                kmIter = 10) # number of reruns of k-means algorithm 
 {
   
+  # Function to calculate a geometric mean
+  gm_mean = function(x, na.rm=TRUE){
+    exp(sum(log(x[x > 0]), na.rm=na.rm) / length(x))
+  }
+  
   # Input checks
   p <- nrow(x)
-  m_instab <- matrix(NA, Bcomp, length(kseq)) 
+  m_instab_frac <- matrix(NA, Bcomp, length(kseq)) # instability normalization by fraction
+  m_instab_diff <- matrix(NA, Bcomp, length(kseq)) # instability normalization by difference
   
   # Compute necesarry bootstrap samples to get Bcomp comparisons
   Bsamp <- ceiling(.5 * (sqrt(8*Bcomp+1) + 1)) # solution to equation Bcomp = Bsamp(Bsamp-1)/2
@@ -100,12 +116,14 @@ cluster_stability2 <- function(x, # n x p data matrix
         
         # Normalize
         if(norm==FALSE) {
-          m_instab[bc, which(kseq==k)] <- InStab
+          m_instab_frac[bc, which(kseq==k)] <- InStab
+          m_instab_diff[bc, which(kseq==k)] <- InStab
         } else {
           tb1 <- table(l_clust[[1]])
           tb2 <- table(l_clust[[2]])
           norm_val <- instab(tb1, tb2, 100)
-          m_instab[bc,which(kseq==k)] <- InStab/norm_val
+          m_instab_frac[bc,which(kseq==k)] <- InStab / norm_val
+          m_instab_diff[bc,which(kseq==k)] <- InStab - norm_val
         }
         
         # else: no prediction
@@ -149,12 +167,14 @@ cluster_stability2 <- function(x, # n x p data matrix
         
         # Normalize
         if(norm==FALSE) {
-          m_instab[bc,which(kseq==k)] <- InStab
+          m_instab_frac[bc, which(kseq==k)] <- InStab
+          m_instab_diff[bc, which(kseq==k)] <- InStab
         } else {
           tb1 <- table(l_cl[[1]])
           tb2 <- table(l_cl[[2]])
           norm_val <- instab(tb1, tb2, 100)
-          m_instab[bc,which(kseq==k)] <- InStab/norm_val
+          m_instab_frac[bc,which(kseq==k)] <- InStab / norm_val
+          m_instab_diff[bc,which(kseq==k)] <- InStab - norm_val
         }
         
       } # end if: prediction TRUE/FALSE
@@ -165,12 +185,27 @@ cluster_stability2 <- function(x, # n x p data matrix
     
   } # end for B
   
-
-  instabM <- colMeans(m_instab)
-  instabMedian <- apply(m_instab, 2, median)
-  kopt <- which.min(instabM)+(min(kseq)-1)
+  # For instability: frac normalization
+  instab_frac_M_arith <- apply(m_instab_frac, 2, mean)
+  instab_frac_M_geo <- apply(m_instab_frac, 2, gm_mean)
   
-  outlist <- list('instabilities'=instabM, 'kopt'=kopt, 'instabilities_median'=instabMedian)
+  # For instability: frac normalization
+  instab_diff_M_arith <- apply(m_instab_diff, 2, mean)
+  instab_diff_M_geo <- apply(m_instab_diff, 2, gm_mean)
+  
+  kopt_FracArith <- which.min(instab_frac_M_arith)+(min(kseq)-1)
+  kopt_FracGeo <- which.min(instab_frac_M_geo)+(min(kseq)-1)
+  kopt_DiffArith <- which.min(instab_diff_M_arith)+(min(kseq)-1)
+  kopt_DiffGeo <- which.min(instab_diff_M_geo)+(min(kseq)-1)
+  
+  outlist <- list('InstFracArith'=instab_frac_M_arith,
+                  'InstFracGeo'=instab_frac_M_geo,
+                  'InstDiffArith'=instab_diff_M_arith,
+                  'InstDiffGeo'=instab_diff_M_geo,
+                  'kopt_FracArith'=kopt_FracArith,
+                  'kopt_FracGeo'=kopt_FracGeo,
+                  'kopt_DiffArith'=kopt_DiffArith,
+                  'kopt_DiffGeo'=kopt_DiffGeo)
   
   return(outlist)
   
