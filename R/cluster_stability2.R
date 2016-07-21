@@ -1,14 +1,5 @@
 
 
-x <- f_circular(1, 100, 1, 3, c(.1, .1), dims=2)
-kseq=2:25
-Bcomp = 10
-prediction = TRUE
-type = 'kmeans'
-pbar = TRUE
-kmIter = 3
-norm =TRUE
-
 cluster_stability2 <- function(x, # n x p data matrix 
                                kseq, # sequence of ks tested
                                Bcomp = 10, # number of bootstrap comparisons
