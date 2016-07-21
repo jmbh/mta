@@ -182,7 +182,7 @@ cluster_stability2 <- function(x, # n x p data matrix
   
   # For instability: frac normalization
   instab_diff_M_arith <- apply(m_instab_diff, 2, mean)
-  instab_diff_M_geo <- apply(m_instab_diff, 2, gm_mean)
+  instab_diff_M_geo <- apply(m_instab_diff+1, 2, gm_mean) # +1 to avoid negative numbers in geometric mean
   
   kopt_FracArith <- which.min(instab_frac_M_arith)+(min(kseq)-1)
   kopt_FracGeo <- which.min(instab_frac_M_geo)+(min(kseq)-1)
