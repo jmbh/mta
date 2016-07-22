@@ -1,5 +1,6 @@
 
 
+
 cluster_stability2 <- function(x, # n x p data matrix 
                                kseq, # sequence of ks tested
                                Bcomp = 10, # number of bootstrap comparisons
@@ -17,8 +18,8 @@ cluster_stability2 <- function(x, # n x p data matrix
   
   # Input checks
   p <- nrow(x)
-  m_instab_frac <- matrix(NA, Bcomp, length(kseq)) # instability normalization by fraction
-  m_instab_diff <- matrix(NA, Bcomp, length(kseq)) # instability normalization by difference
+  m_instab <- matrix(NA, Bcomp, length(kseq)) # no normalization
+  m_instab_norm <- matrix(NA, Bcomp, length(kseq)) # normalization
   
   # Compute necesarry bootstrap samples to get Bcomp comparisons
   Bsamp <- ceiling(.5 * (sqrt(8*Bcomp+1) + 1)) # solution to equation Bcomp = Bsamp(Bsamp-1)/2
@@ -105,17 +106,14 @@ cluster_stability2 <- function(x, # n x p data matrix
         # compute Instability
         InStab <- mean(abs(same_a - same_b)) 
         
-        # Normalize
-        if(norm==FALSE) {
-          m_instab_frac[bc, which(kseq==k)] <- InStab
-          m_instab_diff[bc, which(kseq==k)] <- InStab
-        } else {
-          tb1 <- table(l_clust[[1]])
-          tb2 <- table(l_clust[[2]])
-          norm_val <- instab(tb1, tb2, 100)
-          m_instab_frac[bc,which(kseq==k)] <- InStab / norm_val
-          m_instab_diff[bc,which(kseq==k)] <- InStab - norm_val
-        }
+        # Normalize = FALSE
+        m_instab[bc, which(kseq==k)] <- InStab
+        
+        # Normalize = TRUE
+        tb1 <- table(l_clust[[1]])
+        tb2 <- table(l_clust[[2]])
+        norm_val <- instab(tb1, tb2, 100)
+        m_instab_norm[bc,which(kseq==k)] <- InStab / norm_val
         
         # else: no prediction
       } else {
@@ -156,17 +154,14 @@ cluster_stability2 <- function(x, # n x p data matrix
         InStab <- mean(abs(l_pairind[[1]] - l_pairind[[2]])) 
         
         
-        # Normalize
-        if(norm==FALSE) {
-          m_instab_frac[bc, which(kseq==k)] <- InStab
-          m_instab_diff[bc, which(kseq==k)] <- InStab
-        } else {
-          tb1 <- table(l_cl[[1]])
-          tb2 <- table(l_cl[[2]])
-          norm_val <- instab(tb1, tb2, 100)
-          m_instab_frac[bc,which(kseq==k)] <- InStab / norm_val
-          m_instab_diff[bc,which(kseq==k)] <- InStab - norm_val
-        }
+        # Normalize = FALSE
+        m_instab[bc, which(kseq==k)] <- InStab
+        
+        # Normalize = TRUE
+        tb1 <- table(l_cl[[1]])
+        tb2 <- table(l_cl[[2]])
+        norm_val <- instab(tb1, tb2, 100)
+        m_instab_norm[bc,which(kseq==k)] <- InStab / norm_val
         
       } # end if: prediction TRUE/FALSE
       
@@ -176,27 +171,20 @@ cluster_stability2 <- function(x, # n x p data matrix
     
   } # end for B
   
-  # For instability: frac normalization
-  instab_frac_M_arith <- apply(m_instab_frac, 2, mean)
-  instab_frac_M_geo <- apply(m_instab_frac, 2, gm_mean)
+  # taking the mean
+  m_instab_M <- apply(m_instab, 2, mean)
+  m_instab_norm_M <- apply(m_instab_norm, 2, mean)
   
-  # For instability: frac normalization
-  instab_diff_M_arith <- apply(m_instab_diff, 2, mean)
-  instab_diff_M_geo <- apply(m_instab_diff+1, 2, gm_mean) # +1 to avoid negative numbers in geometric mean
   
-  kopt_FracArith <- which.min(instab_frac_M_arith)+(min(kseq)-1)
-  kopt_FracGeo <- which.min(instab_frac_M_geo)+(min(kseq)-1)
-  kopt_DiffArith <- which.min(instab_diff_M_arith)+(min(kseq)-1)
-  kopt_DiffGeo <- which.min(instab_diff_M_geo)+(min(kseq)-1)
+  kopt_instab <- which.min(m_instab_M)+(min(kseq)-1)
+  kopt_instabN <- which.min(m_instab_norm_M)+(min(kseq)-1)
   
-  outlist <- list('InstFracArith'=instab_frac_M_arith,
-                  'InstFracGeo'=instab_frac_M_geo,
-                  'InstDiffArith'=instab_diff_M_arith,
-                  'InstDiffGeo'=instab_diff_M_geo,
-                  'kopt_FracArith'=kopt_FracArith,
-                  'kopt_FracGeo'=kopt_FracGeo,
-                  'kopt_DiffArith'=kopt_DiffArith,
-                  'kopt_DiffGeo'=kopt_DiffGeo)
+  outlist <- list("kopt_instab"=kopt_instab,
+                  "kopt_instab_norm"=kopt_instabN,
+                  "Instab_path"=m_instab_M,
+                  "Instab_path_norm"=m_instab_norm_M,
+                  "Instab_path_matrix"=m_instab,
+                  "Instab_path_nrom_matrix"=m_instab_norm)
   
   return(outlist)
   
