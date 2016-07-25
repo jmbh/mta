@@ -1,7 +1,4 @@
 
-
-gout <- gap_statistic2(x, kseq=2:25, kmIter = 10)
-
 gap_statistic2 <- function(x, # n x p data matrix
                            kseq, #sequence of ks to be checked 
                            kmIter) # restarts of k means algorithm
