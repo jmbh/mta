@@ -1,5 +1,7 @@
 
 
+gout <- gap_statistic2(x, kseq=2:25, kmIter = 10)
+
 gap_statistic2 <- function(x, # n x p data matrix
                            kseq, #sequence of ks to be checked 
                            kmIter) # restarts of k means algorithm
@@ -55,9 +57,26 @@ gap_statistic2 <- function(x, # n x p data matrix
       Sil <- NULL
     }
     
-    outlist <- list('WCD' = WCD, 'Sil'=Sil)
+    # calc MSE (for jump statistic)
+    if(k>1) {
+    for(i in 1:nrow(x)) {
+      diffs <- (x[i,] - km_model@centers[km_model@cluster[i],])
+      mse <- t(diffs) %*% diffs
+      v_mse[i] <- mse
+    }
+    MSE <- sum(v_mse) / ncol(x)
+    } else {
+      SE <- apply(x, 1, function(inst){
+        diffs <- inst - colMeans(x)
+        return(t(diffs) %*% diffs)
+      })
+      MSE <- sum(SE) / ncol(x)
+    }
+    
+    outlist <- list('WCD' = WCD, 'Sil'=Sil, 'MSE'=MSE)
     return(outlist)
   }
+  
   
   UniformData <- function(x) {
     
@@ -81,14 +100,16 @@ gap_statistic2 <- function(x, # n x p data matrix
   dims <- ncol(x)
   
   # First: Real Data
-  l_WCD_data <- l_Sil <-  list()
+  l_WCD_data <- l_Sil <- l_MSE <-  list()
   for(k in c(1, kseq)) {
     obj <- getWCFandSil(x, k, type = 'data')
     l_WCD_data[[k]] <- obj$WCD
     l_Sil[[k]] <- obj$Sil
+    l_MSE[[k]] <- obj$MSE
   }
   l_WCD_data <- unlist(l_WCD_data)
   l_Sil <- unlist(l_Sil)
+  l_MSE <- unlist(l_MSE)
   
   # Then: Synthetic Data
   l_WCD_syndata_runs <- list()
@@ -112,24 +133,24 @@ gap_statistic2 <- function(x, # n x p data matrix
   
   Gaps <- WCD_syn_log-WCD_data_log
   
-  # Also Compute JUMP Statistic
-  WCD_transf <- l_WCD_data^(- dims/2)
-  jump <- (WCD_transf - c(0, WCD_transf[-length(WCD_transf)]))[-1]
-  k_jump <- which.max(jump)
-  
   # Compute Slope Statistic
   sil <- l_Sil
   p <- 1
   slope <- -(sil[-1] - sil[-length(sil)]) * sil[-1]^p
-  
+  kopt_sil <- which.max(slope)+1 #add one because we have sequence 2:...
+  ## Also Compute JUMP Statistic
+  MSE_transf <- l_MSE^(- dims/2)
+  jump <- (MSE_transf - c(0, MSE_transf[-length(MSE_transf)]))[-1]
+  k_jump <- which.max(jump) + 1 #add one because we have sequence 2:...
   
   outlist <- list('WCD_data'=l_WCD_data, 
                   'WCD_syn'=l_WCD_syntetic,
                   'Gaps'= Gaps,
                   'kopt'=which.max(Gaps),
-                  'kopt_jump'=k_jump+1, #add one because we have sequence 2:...
+                  'kopt_jump'=k_jump,
                   'silhouettes'=sil,
-                  'kopt_sil'=which.max(slope)+1) #add one because we have sequence 2:...
+                  'jumps'=jump,
+                  'kopt_sil'=kopt_sil) 
   
   return(outlist)
   
