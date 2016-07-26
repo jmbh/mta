@@ -55,6 +55,7 @@ gap_statistic2 <- function(x, # n x p data matrix
     }
     
     # calc MSE (for jump statistic)
+    v_mse <- numeric(nrow(x))
     if(k>1) {
     for(i in 1:nrow(x)) {
       diffs <- (x[i,] - km_model@centers[km_model@cluster[i],])
