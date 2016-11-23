@@ -41,7 +41,7 @@ trajcluster <- function(data,
                         prototypes = NA, # list of prototypical trajectories
                         subsampN = NA, # maximal N number of trajectories; to render analysis possible in the case of huge number of trajectories
                         stretch = list('start' = c(0,0),'left' = c(-1,1.5)) #
-                        )
+                        method = 'complete')
   
 {
   
@@ -91,7 +91,7 @@ trajcluster <- function(data,
 
   # +++ clustering +++
   md <- as.dist(distm)
-  clust_obj <- fastcluster::hclust(md, method = "ward.D", )
+  clust_obj <- fastcluster::hclust(md, method = method, )
   cl <- rep(cutree(clust_obj, nclust), each=nResc)
   dat_resc$cl <- cl
   
