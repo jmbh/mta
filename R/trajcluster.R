@@ -40,7 +40,7 @@ trajcluster <- function(data,
                         nResc = 10, # number of data points for spatial rescaling
                         prototypes = NA, # list of prototypical trajectories
                         subsampN = NA, # maximal N number of trajectories; to render analysis possible in the case of huge number of trajectories
-                        stretch = list('start' = c(0,0),'left' = c(-1,1.5)) #
+                        stretch = list('start' = c(0,0),'left' = c(-1,1.5)), #
                         method = 'complete')
   
 {
